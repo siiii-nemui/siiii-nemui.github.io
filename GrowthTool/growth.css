@@ -1,0 +1,380 @@
+/* ツール全体のレイアウト */
+.tool-title-area {
+  max-width: 1200px;
+  margin: 10px auto 0;
+  padding: 0 20px;
+}
+
+.tool-title-area h1 {
+  font-size: 1.2rem;
+  color: #333;
+  border-left: 4px solid #e91e63;
+  padding-left: 10px;
+}
+
+.page-container {
+  display: flex;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  gap: 20px;
+}
+
+/* メインコンテンツ：表示の詰め込み */
+.growth-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.display-area {
+  background: #f4f7f8;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 15px;
+  min-height: 400px;
+  font-size: 0.85rem;
+  padding: 10px;
+  /* 少し内側に寄せる */
+  font-family: sans-serif;
+}
+
+/* ユーザーごとのブロック（画像参照） */
+.user-block {
+  margin-bottom: 12px;
+  padding-bottom: 5px;
+  border-bottom: 1.5px solid #444; /* 画像に近い細めの黒線 */
+}
+
+.user-block {
+  margin-bottom: 12px;
+  padding-bottom: 5px;
+  border-bottom: 1.5px solid #444; /* 画像に近い細めの黒線 */
+}
+
+.user-name {
+  font-weight: bold;
+  font-size: 0.95rem;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.tab-name {
+  font-weight: bold;
+  font-size: 0.85rem;
+  display: block;
+  margin: 4px 0 0 0; /* タブ名の上の余白 */
+  padding-left: 0;
+}
+
+.log-line {
+  font-size: 0.85rem;
+  line-height: 1.2; /* 行間をギチギチに詰める */
+  margin: 0; /* 上下の隙間をゼロに */
+  padding-left: 1.2em; /* 技能名の左側にインデントを入れる */
+  white-space: nowrap; /* 折り返さず1行に見せる（必要に応じて） */
+}
+
+/* 判定色 */
+.critical {
+  color: #2196f3;
+}
+.fumble {
+  color: #e91e63;
+}
+.initial {
+  color: #333;
+}
+
+#output-text {
+  width: 100%;
+  height: 150px;
+  font-size: 0.8rem;
+  line-height: 1.2;
+  padding: 8px;
+  border: 1px solid #ccc;
+  white-space: pre; /* 改行とスペースを保持 */
+}
+
+/* サイドバー：画像のUI再現 */
+.sidebar {
+  width: 260px;
+  background: #eeeeee;
+  border-radius: 8px;
+  padding: 15px;
+  font-size: 0.85rem;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
+}
+
+.tab-selector {
+  display: flex;
+  border: 1px solid #333;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+.tab {
+  flex: 1;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.tab.active {
+  background: #e91e63;
+  color: #fff;
+}
+
+.tab.disabled {
+  background: #fff;
+  color: #333;
+}
+
+.control-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #ccc;
+}
+
+/* トグルスイッチの見た目（マゼンタ） */
+.toggle {
+  appearance: none;
+  width: 34px;
+  height: 18px;
+  background: #ccc;
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+}
+
+.toggle:checked {
+  background: #e91e63;
+}
+
+.toggle::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: white;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: 0.2s;
+}
+
+.toggle:checked::after {
+  left: 18px;
+}
+
+/* 入力・ボタン系 */
+.input-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 5px 0;
+}
+
+.input-row input {
+  width: 80px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.main-copy-btn {
+  width: 100%;
+  background: #e91e63;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  font-weight: bold;
+  margin-top: 15px;
+  cursor: pointer;
+}
+
+.text-output textarea {
+  width: 100%;
+  height: 100px;
+  font-family: monospace;
+  font-size: 0.8rem;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.exclude-section {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* ブロック間の隙間 */
+}
+
+.input-block {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.exclude-section label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.exclude-section input[type="text"] {
+  width: 100%; /* 横幅いっぱい */
+  box-sizing: border-box;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.inline-input {
+  display: flex;
+  gap: 5px;
+}
+
+.inline-input input {
+  flex: 1; /* 入力欄を伸ばす */
+}
+
+.add-btn {
+  background-color: #e91e63;
+  color: white;
+  border: none;
+  padding: 0 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* 追加されたタブチップのスタイル */
+#exclude-tabs-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 5px;
+}
+
+/* サイドバー全体の配置を整える */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* 各入力ブロックが縦に並ぶようにする */
+.exclude-section {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.input-block {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.input-block label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.input-block input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.inline-input {
+  display: flex;
+  gap: 5px;
+}
+
+.add-btn {
+  background-color: #e91e63;
+  color: white;
+  border: none;
+  padding: 0 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* コピーボタン */
+.main-copy-btn {
+  width: 100%;
+  background: #e91e63;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.user-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px dashed #ccc;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.user-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 10px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: grab;
+  font-size: 0.8rem;
+}
+
+.user-item.hidden {
+  opacity: 0.5;
+  background: #eee;
+  text-decoration: line-through;
+}
+
+.user-item:active {
+  cursor: grabbing;
+}
+
+.display-mode-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.mode-btn {
+  padding: 5px 15px;
+  border: 1px solid #e91e63;
+  background: transparent;
+  color: #e91e63;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: 0.3s;
+}
+
+.mode-btn.active {
+  background: #e91e63;
+  color: white;
+}

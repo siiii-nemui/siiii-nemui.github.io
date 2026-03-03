@@ -30,10 +30,20 @@ header {
     z-index: 100;
 }
 
-.logo {
+.logo a {
+    color: var(--text-main);
     font-size: 1.25rem;
     font-weight: bold;
     letter-spacing: 0.05em;
+    /* ロゴリンクは下線なし、状態変化しない */
+    text-decoration: none;
+}
+
+/* ロゴリンクの訪問済み・アクティブ時も色を変えない */
+.logo a:visited,
+.logo a:active {
+    color: var(--text-main);
+    text-decoration: none;
 }
 
 nav ul {
@@ -46,7 +56,7 @@ nav ul {
 
 nav a {
     text-decoration: none;
-    color: var(--text-sub);
+    color: #808080;
     font-size: 0.9rem;
     font-weight: 500;
     transition: color 0.3s;
@@ -130,4 +140,8 @@ footer {
     border-top: 1px solid var(--border);
     margin-top: 6rem;
     background-color: white;
+}
+
+footer a {
+    color:#808080;
 }
