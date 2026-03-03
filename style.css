@@ -16,7 +16,12 @@ body {
   flex-direction: column;
   background-color: var(--bg-color);
   color: var(--text-main);
-  font-family: ...; /* 既存の設定 */
+  font-family:
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans",
+    Meiryo, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  line-height: 1.6;
 }
 
 /* ヘッダー */
@@ -70,11 +75,12 @@ nav a:hover {
 
 /* メインレイアウト */
 main {
-  flex: 1; /* これでコンテンツが少なくてもmainが伸び、フッターを下に押し下げます */
+  flex: 1;
   width: 100%;
-  max-width: 1000px;
+  /* max-width: 1000px; を削除して、画面の95%まで広がるようにします */
+  max-width: 95%;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: 1rem 1.5rem;
   box-sizing: border-box;
 }
 

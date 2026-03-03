@@ -1,8 +1,7 @@
 /* ツール全体のレイアウト */
 .tool-title-area {
-  max-width: 1200px;
-  margin: 10px auto 0;
-  padding: 0 20px;
+  max-width: 100% !important;
+  padding: 20px 40px 0; /* 左右に少し余裕を持たせる */
 }
 
 .tool-title-area h1 {
@@ -14,30 +13,29 @@
 
 .page-container {
   display: flex;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 10px 20px;
-  gap: 20px;
+  max-width: 100% !important;
+  margin: 0 70px;
+  padding: 10px 40px;
+  gap: 30px;
 }
 
 /* メインコンテンツ：表示の詰め込み */
 .growth-main {
-  flex: 1;
+  flex: 1; /* 左側をぐーんと伸ばす */
+  min-width: 0; /* 文字溢れによるレイアウト崩れ防止 */
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
 .display-area {
+  width: 100%;
   background: #f4f7f8;
   border: 1px solid #ddd;
   border-radius: 4px;
   padding: 15px;
-  min-height: 400px;
-  font-size: 0.85rem;
-  padding: 10px;
-  /* 少し内側に寄せる */
-  font-family: sans-serif;
+  min-height: 500px;
+  box-sizing: border-box;
 }
 
 /* ユーザーごとのブロック（画像参照） */
@@ -70,10 +68,11 @@
 
 .log-line {
   font-size: 0.85rem;
-  line-height: 1.2; /* 行間をギチギチに詰める */
-  margin: 0; /* 上下の隙間をゼロに */
-  padding-left: 1.2em; /* 技能名の左側にインデントを入れる */
-  white-space: nowrap; /* 折り返さず1行に見せる（必要に応じて） */
+  line-height: 1.4; /* ギチギチすぎたので少しだけ緩めました */
+  margin: 2px 0;
+  padding-left: 1.5em;
+  white-space: normal; /* 画面を広げた分、長いログも折り返して表示 */
+  word-break: break-all;
 }
 
 /* 判定色 */
@@ -95,16 +94,19 @@
   padding: 8px;
   border: 1px solid #ccc;
   white-space: pre; /* 改行とスペースを保持 */
+  box-sizing: border-box;
 }
 
 /* サイドバー：画像のUI再現 */
 .sidebar {
-  width: 260px;
+  width: 320px; /* 少し太めにして視認性アップ */
+  flex-shrink: 0; /* 画面が狭まっても潰されないように固定 */
   background: #eeeeee;
   border-radius: 8px;
-  padding: 15px;
-  font-size: 0.85rem;
-  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  position: sticky;
+  top: 80px; /* ヘッダーに被らない位置で固定 */
+  height: fit-content;
 }
 
 .tab-selector {
@@ -261,13 +263,6 @@
   margin-top: 5px;
 }
 
-/* サイドバー全体の配置を整える */
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
 /* 各入力ブロックが縦に並ぶようにする */
 .exclude-section {
   margin-top: 15px;
@@ -386,4 +381,18 @@
   border-left: 5px solid #e91e63;
   padding-left: 15px;
   line-height: 1.2;
+}
+
+/* コンテナをFlexboxにして、中身を横いっぱいに広げる */
+.growth-container {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+  width: 100%;
+}
+
+/* ログが表示されるメインエリアを「残り全部」の幅に伸ばす */
+.display-section {
+  flex: 1; /* これで左側がぐーんと伸びます */
+  min-width: 0;
 }
