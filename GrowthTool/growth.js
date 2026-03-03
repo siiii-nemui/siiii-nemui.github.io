@@ -94,6 +94,8 @@ function processLog(htmlContent) {
   const doc = parser.parseFromString(htmlContent, "text/html");
   const messages = doc.querySelectorAll("p");
   rawLogData = [];
+  userOrder = []; // 人物一覧（並び順・表示設定）をリセット
+  document.getElementById("user-list").innerHTML = ""; // 画面上の人物リスト表示もクリア
 
   messages.forEach((msg, index) => {
     const text = msg.textContent.trim();
@@ -229,25 +231,30 @@ function applyFilters() {
         entry.value,
         entry.status,
       );
-      let isHidden = isStatExcluded; // 能力値除外なら隠す
+      let isHidden = false;
 
-      // UIフィルタ（クリティカル等）のチェック
-      if (type === "critical" && !ui.critical) isHidden = true;
-      if (type === "special" && !ui.special) isHidden = true;
-      if (type === "fumble" && !ui.fumble) isHidden = true;
-      if (type === "initial" && !ui.initial) isHidden = true;
-      if (type === "success" && !ui.success) isHidden = true;
-      if (type === "other" && !ui.failure) isHidden = true;
+      // 1. 能力値排除（既存ロジック）
+      if (ui.excludeStats) {
+        const isRegistered = Object.keys(initialValues).some((s) =>
+          skillDetail.includes(s),
+        );
+        const hasBracket = /【.*?】/.test(log.fullText);
+        const isStat =
+          /SAN|ＳＡＮ|正気度|アイデア|知識|幸運|STR|CON|POW|DEX|APP|SIZ|INT|EDU/.test(
+            log.fullText,
+          ) || /\*\d+/.test(log.fullText);
+        if (!isRegistered && (!hasBracket || isStat)) isHidden = true;
+      }
 
-      // 出目フィルタ
-      if (!isHidden && ui.valMin !== "" && entry.value < parseInt(ui.valMin))
-        isHidden = true;
-      if (!isHidden && ui.valEq !== "" && entry.value !== parseInt(ui.valEq))
-        isHidden = true;
-      if (!isHidden && ui.valMax !== "" && entry.value > parseInt(ui.valMax))
-        isHidden = true;
+      // 2. 出目フィルタ（ここを修正：数値変換と空欄チェックを厳密化）
+      if (!isHidden) {
+        const val = parseInt(entry.value);
+        if (ui.valMin !== "" && val < parseInt(ui.valMin)) isHidden = true;
+        if (ui.valEq !== "" && val !== parseInt(ui.valEq)) isHidden = true;
+        if (ui.valMax !== "" && val > parseInt(ui.valMax)) isHidden = true;
+      }
 
-      // 重複排除チェック
+      // 3. 重複排除（既存ロジック）
       if (!isHidden && ui.unique) {
         let skillName = "";
         for (let s in initialValues) {
@@ -257,12 +264,19 @@ function applyFilters() {
           }
         }
         if (skillName) {
-          if (userSkillHistory[log.name].has(skillName)) {
-            isHidden = true; // 既出なら隠す
-          } else {
-            userSkillHistory[log.name].add(skillName);
-          }
+          if (userSkillHistory[log.name].has(skillName)) isHidden = true;
+          else userSkillHistory[log.name].add(skillName);
         }
+      }
+
+      // 4. UIトグル判定（成功・失敗などの種類別）
+      if (!isHidden) {
+        if (type === "critical" && !ui.critical) isHidden = true;
+        else if (type === "special" && !ui.special) isHidden = true;
+        else if (type === "fumble" && !ui.fumble) isHidden = true;
+        else if (type === "initial" && !ui.initial) isHidden = true;
+        else if (type === "success" && !ui.success) isHidden = true;
+        else if (type === "other" && !ui.failure) isHidden = true;
       }
 
       return { type, isHidden };
@@ -289,17 +303,33 @@ function applyFilters() {
 }
 
 function getFinalType(detail, target, value, status) {
-  if (value <= 5 || status.includes("決定的成功")) return "critical";
-  if (status.includes("スペシャル")) return "special";
-  if (value >= 96 || status.includes("致命的失敗")) return "fumble";
-  let isInitialVal = false;
-  for (let skill in initialValues) {
-    if (detail.includes(skill) && target === initialValues[skill]) {
-      isInitialVal = true;
-      break;
+  // 1. まず「成功したかどうか」を大前提にする
+  const isSuccess = value <= target;
+
+  // 2. 成功している場合のみ、クリティカルやスペシャルの判定を行う
+  if (isSuccess) {
+    // 1-5 かつ 目標値以下ならクリティカル
+    if (value <= 5 || status.includes("決定的成功")) return "critical";
+
+    // スペシャル（目標値の1/5以下）
+    if (status.includes("スペシャル")) return "special";
+
+    // 初期値成功のチェック
+    let isInitialVal = false;
+    for (let skill in initialValues) {
+      if (detail.includes(skill) && target === initialValues[skill]) {
+        isInitialVal = true;
+        break;
+      }
     }
+    return isInitialVal ? "initial" : "success";
   }
-  if (value <= target) return isInitialVal ? "initial" : "success";
+
+  // 3. 失敗している場合
+  // 96-100 はファンブル
+  if (value >= 96 || status.includes("致命的失敗")) return "fumble";
+
+  // それ以外はただの失敗
   return "other";
 }
 
@@ -547,3 +577,6 @@ document
       addExcludeTab();
     }
   });
+document.getElementById("val-min").addEventListener("input", applyFilters);
+document.getElementById("val-eq").addEventListener("input", applyFilters);
+document.getElementById("val-max").addEventListener("input", applyFilters);
