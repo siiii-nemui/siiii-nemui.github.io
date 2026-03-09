@@ -192,10 +192,11 @@ function applyFilters() {
 
   let filteredData = {};
   let foundTrigger = ui.afterStr === "";
+
+  // 人物ごとの重複チェック用Set
   let userSkillHistory = {};
 
   rawLogData.forEach((log) => {
-    // 1. トリガーチェック
     if (!foundTrigger) {
       if (log.fullText.includes(ui.afterStr)) foundTrigger = true;
       if (!foundTrigger || !log.isDice) return;
@@ -205,26 +206,9 @@ function applyFilters() {
 
     if (!userSkillHistory[log.name]) userSkillHistory[log.name] = new Set();
 
-    let displayLog = JSON.parse(JSON.stringify(log)); // 深いコピーで元のデータを守る
+    let displayLog = JSON.parse(JSON.stringify(log));
 
-    // 能力値・SAN等の除外判定（フラグ管理に変更）
-    let isStatExcluded = false;
-    if (ui.excludeStats) {
-      const bodyText = log.fullText;
-      const isRegisteredSkill = Object.keys(initialValues).some((skill) =>
-        bodyText.includes(skill),
-      );
-      const hasSkillBracket = /【.*?】/.test(bodyText);
-      const isStatRoll =
-        /SAN|ＳＡＮ|正気度|アイデア|知識|幸運|db|ダメージボーナス|集計|野外|STR|CON|POW|DEX|APP|SIZ|INT|EDU/.test(
-          bodyText,
-        ) || /\*\d+/.test(bodyText);
-      if (!isRegisteredSkill && (!hasSkillBracket || isStatRoll)) {
-        isStatExcluded = true;
-      }
-    }
-
-    const processEntry = (entry, skillDetail) => {
+    const checkEntry = (entry, skillDetail) => {
       const type = getFinalType(
         skillDetail,
         entry.target,
@@ -233,7 +217,7 @@ function applyFilters() {
       );
       let isHidden = false;
 
-      // 1. 能力値排除（既存ロジック）
+      // 1. 能力値排除
       if (ui.excludeStats) {
         const isRegistered = Object.keys(initialValues).some((s) =>
           skillDetail.includes(s),
@@ -246,15 +230,24 @@ function applyFilters() {
         if (!isRegistered && (!hasBracket || isStat)) isHidden = true;
       }
 
-      // 2. 出目フィルタ（ここを修正：数値変換と空欄チェックを厳密化）
+      // 2. 出目・種類別フィルタ（重複判定より先に実行）
       if (!isHidden) {
+        // 出目比較
         const val = parseInt(entry.value);
         if (ui.valMin !== "" && val < parseInt(ui.valMin)) isHidden = true;
         if (ui.valEq !== "" && val !== parseInt(ui.valEq)) isHidden = true;
         if (ui.valMax !== "" && val > parseInt(ui.valMax)) isHidden = true;
+
+        // トグル状態
+        if (type === "critical" && !ui.critical) isHidden = true;
+        else if (type === "special" && !ui.special) isHidden = true;
+        else if (type === "fumble" && !ui.fumble) isHidden = true;
+        else if (type === "initial" && !ui.initial) isHidden = true;
+        else if (type === "success" && !ui.success) isHidden = true;
+        else if (type === "other" && !ui.failure) isHidden = true;
       }
 
-      // 3. 重複排除（既存ロジック）
+      // 3. 【最重要修正】これまでの全てのフィルタをパスしたものだけ、重複チェックを行う
       if (!isHidden && ui.unique) {
         let skillName = "";
         for (let s in initialValues) {
@@ -264,19 +257,12 @@ function applyFilters() {
           }
         }
         if (skillName) {
-          if (userSkillHistory[log.name].has(skillName)) isHidden = true;
-          else userSkillHistory[log.name].add(skillName);
+          if (userSkillHistory[log.name].has(skillName)) {
+            isHidden = true; // フィルタをパスしたものでも、2回目なら隠す
+          } else {
+            userSkillHistory[log.name].add(skillName); // 初めて「表示条件に合う」ログが出たので登録
+          }
         }
-      }
-
-      // 4. UIトグル判定（成功・失敗などの種類別）
-      if (!isHidden) {
-        if (type === "critical" && !ui.critical) isHidden = true;
-        else if (type === "special" && !ui.special) isHidden = true;
-        else if (type === "fumble" && !ui.fumble) isHidden = true;
-        else if (type === "initial" && !ui.initial) isHidden = true;
-        else if (type === "success" && !ui.success) isHidden = true;
-        else if (type === "other" && !ui.failure) isHidden = true;
       }
 
       return { type, isHidden };
@@ -284,12 +270,11 @@ function applyFilters() {
 
     if (log.isMulti) {
       displayLog.subResults = log.subResults.map((sub) => {
-        const res = processEntry(sub, log.title);
+        const res = checkEntry(sub, log.title);
         return { ...sub, type: res.type, isHidden: res.isHidden };
       });
-      // すべての結果が非表示でも、CFカウントのためにデータは送る
     } else {
-      const res = processEntry(log, log.detail);
+      const res = checkEntry(log, log.detail);
       displayLog.type = res.type;
       displayLog.isHidden = res.isHidden;
     }

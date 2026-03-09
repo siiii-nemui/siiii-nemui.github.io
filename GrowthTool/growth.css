@@ -396,3 +396,38 @@
   flex: 1; /* これで左側がぐーんと伸びます */
   min-width: 0;
 }
+
+/* 画面幅が狭い時（スマホ・タブレット等）の調整 */
+@media (max-width: 900px) {
+  /* 1. タイトルが縦長に潰れるのを防ぐ */
+  .tool-title {
+    white-space: nowrap; /* 改行させない */
+    font-size: 1.2rem; /* 少し小さくして収める */
+  }
+
+  /* 2. 横並び(flex)を縦並び(column)に変更 */
+  .page-container {
+    flex-direction: column;
+    padding: 10px 15px; /* 左右の余白を削って画面を有効活用 */
+  }
+
+  /* 3. サイドバーを画面幅いっぱいに広げる */
+  .sidebar {
+    width: 100% !important;
+    position: static; /* 画面に固定するのをやめる */
+    order: -1; /* サイドバー（設定項目）を上に持ってくる場合はこれを入れる */
+    margin-bottom: 20px;
+  }
+
+  /* 4. メインエリア（ログ表示）も幅100%に */
+  .growth-main {
+    width: 100%;
+  }
+
+  /* 5. ログが横にはみ出さないように調整 */
+  .log-line {
+    white-space: normal; /* 折り返しを許可 */
+    word-break: break-all;
+    padding-left: 1em;
+  }
+}
