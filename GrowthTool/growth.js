@@ -247,20 +247,29 @@ function applyFilters() {
         else if (type === "other" && !ui.failure) isHidden = true;
       }
 
-      // 3. 【最重要修正】これまでの全てのフィルタをパスしたものだけ、重複チェックを行う
+      // 3. これまでの全てのフィルタをパスしたものだけ、重複チェックを行う
       if (!isHidden && ui.unique) {
         let skillName = "";
-        for (let s in initialValues) {
-          if (skillDetail.includes(s)) {
-            skillName = s;
-            break;
+
+        // まずは【 】の中身を探す（小さな棍棒などリスト外技能への対応）
+        const bracketMatch = skillDetail.match(/【(.*?)】/);
+        if (bracketMatch) {
+          skillName = bracketMatch[1];
+        } else {
+          // 括弧がない場合は、従来通りリストから探す（回避、目星など）
+          for (let s in initialValues) {
+            if (skillDetail.includes(s)) {
+              skillName = s;
+              break;
+            }
           }
         }
+
         if (skillName) {
           if (userSkillHistory[log.name].has(skillName)) {
-            isHidden = true; // フィルタをパスしたものでも、2回目なら隠す
+            isHidden = true; // 2回目以降なら隠す
           } else {
-            userSkillHistory[log.name].add(skillName); // 初めて「表示条件に合う」ログが出たので登録
+            userSkillHistory[log.name].add(skillName); // 初見の技能名を登録
           }
         }
       }
