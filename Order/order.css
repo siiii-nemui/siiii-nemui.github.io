@@ -1,0 +1,158 @@
+/* order.css */
+.tool-title-area {
+  max-width: 100% !important;
+  padding: 20px 40px 0; /* 左右に少し余裕を持たせる */
+}
+
+.tool-title-area h1 {
+  font-size: 1.2rem;
+  color: #333;
+  border-left: 4px solid #e91e63;
+  padding-left: 10px;
+}
+
+/* 1. PCでのワイド並び（growth.css の page-container を踏襲） */
+.page-container {
+  display: flex;
+  max-width: 100% !important; /* 1200pxの壁を壊す */
+  padding: 10px 40px;
+  gap: 30px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 2. 左側フォームエリア（growth-main を踏襲） */
+.order-form-side {
+  flex: 1; /* 左側をぐーんと伸ばす */
+  min-width: 0;
+}
+
+/* 3. 右側プレビューエリア（sidebar を踏襲） */
+.order-preview-side textarea {
+  width: 380px !important; /* 横幅いっぱい */
+  height: 400px !important; /* 縦幅を大きく確保（テンプレが全部見えるように） */
+  margin-bottom: 15px; /* ボタンとの隙間 */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: monospace; /* 等幅フォント */
+  font-size: 0.85rem;
+  box-sizing: border-box; /* パディングを含めて100%に */
+  background-color: white; /* 入力欄と差別化するために白地に */
+  resize: vertical; /* ユーザーが縦幅だけ調整できるように */
+}
+
+#copy-order {
+  /* インラインブロックだと中身に引きずられるので、ブロック要素に固定 */
+  display: block !important;
+  width: 100% !important;
+
+  /* 高さが変わるのも防ぐ */
+  height: 44px !important;
+  line-height: 24px;
+
+  background-color: #e91e63;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+
+  /* 文字を中央に固定 */
+  text-align: center;
+  box-sizing: border-box;
+
+  /* 余計な余白をリセット */
+  margin: 10px 0 0 0;
+}
+
+/* 4. 細かいUIの「成長チェック風」調整 */
+.display-area {
+  background: #f4f7f8; /* ログ表示と同じ、少し青みがかった白 */
+}
+
+/* 各フォーム項目を「能力値除外」などのトグル行と同じような見た目に */
+.control-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #ccc; /* 下線を入れる */
+}
+
+.control-item label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  color: #333;
+}
+
+.form-group-block h3 {
+  color: #e91e63; /* マゼンタピンク */
+  font-size: 0.95rem;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+/* 5. スマホ（900px以下）の時の「今のまま」縦並び（media query をそのまま使用） */
+/* スマホ・タブレット等（900px以下）の調整 */
+@media (max-width: 900px) {
+  .page-container {
+    flex-direction: column; /* 縦並びにする */
+    padding: 10px 15px;
+    margin: 0 !important;
+  }
+
+  .sidebar {
+    width: 100% !important;
+    position: static; /* 画面固定を解除 */
+    /* order: -1;  ← これを削除（または 1 に設定）することで下に配置されます */
+    order: 1;
+    margin-top: 20px;
+    margin-bottom: 40px;
+  }
+
+  .growth-main {
+    width: 100%;
+    order: 0; /* フォームを上に配置 */
+  }
+
+  /* プレビューエリア内のテキストボックスをスマホでも見やすく */
+  .order-preview-side textarea {
+    height: 300px !important; /* スマホでは少し高さを抑える */
+    width: 100% !important; /* 横幅いっぱい */
+  }
+}
+
+/* 納期エリア全体の縦並びを管理 */
+.stack-item {
+  flex-direction: column; /* 中身を縦に積む */
+  align-items: flex-start !important; /* 左寄せ */
+  padding: 8px 0;
+}
+
+/* ラベルと入力欄だけを横に並べる */
+.input-row-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%; /* 横幅いっぱい使って両端に寄せる */
+  margin-bottom: 5px; /* 警告文との隙間 */
+}
+
+/* 警告文のスタイル調整 */
+.warning-text {
+  color: #e91e63;
+  font-size: 0.75rem;
+  font-weight: bold;
+  line-height: 1.4;
+  background-color: rgba(
+    233,
+    30,
+    99,
+    0.05
+  ); /* ほんのり背景色をつけて注意を引く */
+  padding: 5px 10px;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}

@@ -160,3 +160,54 @@ footer {
 footer a {
   color: #808080;
 }
+
+.update-history {
+  margin-top: 40px;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+}
+
+.update-history h3 {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #e91e63;
+  display: inline-block;
+}
+
+.history-container {
+  max-height: 150px;
+  overflow-y: auto; /* 履歴が増えても邪魔にならないようスクロール可能に */
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.history-container ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.history-container li {
+  padding: 4px 0;
+  border-bottom: 1px dashed #eee;
+}
+
+.history-container li strong {
+  color: #333;
+  margin-right: 10px;
+}
+
+.tool-title-area {
+  max-width: 100% !important;
+  padding: 20px 40px 0; /* 左右に少し余裕を持たせる */
+}
+
+.tool-title-area h1 {
+  font-size: 1.2rem;
+  color: #333;
+  border-left: 4px solid #e91e63;
+  padding-left: 10px;
+}

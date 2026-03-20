@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ORDER SHEET | しいたけTOOLs</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="order.css" />
+  </head>
+  <body>
+    <header>
+      <div class="logo"><a href="../index.html">しいたけTOOLs</a></div>
+      <nav>
+        <ul>
+          <li><a href="#dice">ダイス</a></li>
+          <li><a href="../GrowthTool/growth.html">CoC6成長チェック</a></li>
+          <li><a href="../Order/order.html">依頼テンプレート</a></li>
+          <li><a href="../Download/download.html">ダウンロード</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="growth-container order-main-content">
+      <div class="tool-title-area">
+        <h1 class="tool-title">イラスト依頼テンプレート</h1>
+        <p class="tool-subtitle">
+          各項目を入力すると、プレビューに反映されます。
+        </p>
+      </div>
+
+      <div class="page-container">
+        <div class="growth-main order-form-side">
+          <section class="display-area">
+            <div class="form-group-block">
+              <h3>【依頼内容】</h3>
+              <div class="control-item">
+                <label>描画範囲</label>
+                <select id="draw-range">
+                  <option value="胸上">胸上</option>
+                  <option value="膝上">膝上</option>
+                  <option value="全身" selected>全身</option>
+                </select>
+              </div>
+              <div class="control-item">
+                <label>立ち絵枚数</label>
+                <input type="number" id="count" value="1" min="1" />
+              </div>
+              <div class="control-item">
+                <label>衣装差分</label>
+                <div class="input-group">
+                  <select id="outfit-toggle">
+                    <option value="無">無</option>
+                    <option value="有">有</option>
+                  </select>
+                  <div id="outfit-count-wrap" style="display: none">
+                    <input type="number" id="outfit-count" value="1" min="1" />
+                    枚
+                  </div>
+                </div>
+              </div>
+              <div class="control-item">
+                <label>表情差分</label>
+                <div class="input-group">
+                  <select id="face-toggle">
+                    <option value="無">無</option>
+                    <option value="有">有</option>
+                  </select>
+                  <div id="face-count-wrap" style="display: none">
+                    <input type="number" id="face-count" value="1" min="1" /> 枚
+                  </div>
+                </div>
+              </div>
+
+              <div class="control-item">
+                <label>画像サイズ / 解像度</label>
+                <div class="inline-input">
+                  <input
+                    type="text"
+                    id="img-size"
+                    placeholder="例: 2500*3000px"
+                  />
+                  <input type="text" id="img-dpi" placeholder="例: 350dpi" />
+                </div>
+              </div>
+              <div class="control-item">
+                <label>著作権譲渡・商用利用</label>
+                <select id="commercial-toggle">
+                  <option value="無">無</option>
+                  <option value="有">有</option>
+                </select>
+              </div>
+              <div class="control-item">
+                <label>実績公開の可否</label>
+                <select id="portfolio">
+                  <option value="可">可</option>
+                  <option value="不可">不可</option>
+                </select>
+              </div>
+              <div class="control-item stack-item">
+                <div class="input-row-main">
+                  <label>希望納期</label>
+                  <input type="date" id="deadline" />
+                </div>
+
+                <div
+                  id="deadline-warning"
+                  class="warning-text"
+                  style="display: none"
+                >
+                  ⚠️ 1週間以内の納期をご希望の場合、特急料金が発生いたします。
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group-block">
+              <h3>【キャラクター詳細】</h3>
+              <div class="control-item">
+                <label>世界観（ジャンル等）</label>
+                <input
+                  type="text"
+                  id="world"
+                  placeholder="シナリオ名、ジャンル等"
+                />
+              </div>
+              <div class="control-item">
+                <label>性別</label>
+                <select id="gender-select">
+                  <option value="男">男</option>
+                  <option value="女">女</option>
+                  <option value="その他">その他</option>
+                </select>
+              </div>
+              <div class="control-item">
+                <label>髪型・色</label>
+                <input type="text" id="hair" />
+              </div>
+              <div class="control-item">
+                <label>目・色</label>
+                <input type="text" id="eye" />
+              </div>
+              <div class="control-item">
+                <label>肌色</label>
+                <input type="text" id="skin" />
+              </div>
+              <div class="control-item">
+                <label>服装</label>
+                <input type="text" id="clothing" />
+              </div>
+              <div class="control-item">
+                <label>その他特徴・性格</label>
+                <textarea id="details" rows="2"></textarea>
+              </div>
+              <div class="control-item">
+                <label>資料画像の有無</label>
+                <select id="ref-image">
+                  <option value="有">有</option>
+                  <option value="無">無</option>
+                </select>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <aside class="sidebar order-preview-side">
+          <h3 class="category-label">出力プレビュー</h3>
+          <textarea id="output-text" readonly></textarea>
+          <button class="main-copy-btn" id="copy-order">
+            テンプレをコピー
+          </button>
+        </aside>
+      </div>
+    </main>
+
+    <section class="update-history">
+      <h3>更新履歴</h3>
+      <div class="history-container">
+        <ul>
+          <li><strong>2026/03/20</strong> - 依頼テンプレツール 公開</li>
+        </ul>
+      </div>
+    </section>
+
+    <footer>
+      <p>
+        &copy; 2026 椎(<a href="https://x.com/siiii_nemui">@siiii_nemui</a>).
+        All Rights Reserved.
+      </p>
+    </footer>
+
+    <script src="order.js"></script>
+  </body>
+</html>
