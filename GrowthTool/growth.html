@@ -8,23 +8,19 @@
     <link rel="stylesheet" href="../style.css" />
     <link rel="stylesheet" href="growth.css" />
 
-    <link rel="icon" href="image/hpicon.png" sizes="any" />
-    <link rel="apple-touch-icon" href="image/hpicon.png" sizes="256x256" />
-    <link rel="icon" type="image/png" href="image/hpicon.png" sizes="256x256" />
+    <link rel="icon" href="../image/hpicon.png" sizes="any" />
+    <link rel="apple-touch-icon" href="../image/hpicon.png" sizes="256x256" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="../image/hpicon.png"
+      sizes="256x256"
+    />
+    <script src="../js/include.js" defer></script>
   </head>
 
   <body>
-    <header>
-      <div class="logo"><a href="../index.html">しいたけTOOLs</a></div>
-      <nav>
-        <ul>
-          <li><a href="#dice">ダイス</a></li>
-          <li><a href="../GrowthTool/growth.html">CoC6成長チェック</a></li>
-          <li><a href="../Order/order.html">依頼テンプレート</a></li>
-          <li><a href="../Download/download.html">ダウンロード</a></li>
-        </ul>
-      </nav>
-    </header>
+    <div data-include="../components/header.html"></div>
 
     <div class="page-container">
       <main class="growth-main">
@@ -168,12 +164,7 @@
       </div>
     </section>
 
-    <footer>
-      <p>
-        &copy; 2026 椎(<a href="https://x.com/siiii_nemui">@siiii_nemui</a>).
-        All Rights Reserved.
-      </p>
-    </footer>
+    <div data-include="../components/footer.html"></div>
 
     <script src="growth.js"></script>
   </body>

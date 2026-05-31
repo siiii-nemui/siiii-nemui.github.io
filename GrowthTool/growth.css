@@ -1,23 +1,4 @@
-/* ツール全体のレイアウト */
-.tool-title-area {
-  max-width: 100% !important;
-  padding: 20px 40px 0; /* 左右に少し余裕を持たせる */
-}
-
-.tool-title-area h1 {
-  font-size: 1.2rem;
-  color: #333;
-  border-left: 4px solid #e91e63;
-  padding-left: 10px;
-}
-
-.page-container {
-  display: flex;
-  max-width: 100% !important;
-  margin: 0 70px;
-  padding: 10px 40px;
-  gap: 30px;
-}
+/* GrowthTool/growth.css */
 
 /* メインコンテンツ：表示の詰め込み */
 .growth-main {
@@ -28,23 +9,7 @@
   gap: 15px;
 }
 
-.display-area {
-  width: 100%;
-  background: #f4f7f8;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 15px;
-  min-height: 500px;
-  box-sizing: border-box;
-}
-
 /* ユーザーごとのブロック（画像参照） */
-.user-block {
-  margin-bottom: 12px;
-  padding-bottom: 5px;
-  border-bottom: 1.5px solid #444; /* 画像に近い細めの黒線 */
-}
-
 .user-block {
   margin-bottom: 12px;
   padding-bottom: 5px;
@@ -135,14 +100,6 @@
   color: #333;
 }
 
-.control-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 6px 0;
-  border-bottom: 1px solid #ccc;
-}
-
 /* トグルスイッチの見た目（マゼンタ） */
 .toggle {
   appearance: none;
@@ -185,18 +142,6 @@
   width: 80px;
   border: 1px solid #ccc;
   border-radius: 4px;
-}
-
-.main-copy-btn {
-  width: 100%;
-  background: #e91e63;
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 4px;
-  font-weight: bold;
-  margin-top: 15px;
-  cursor: pointer;
 }
 
 .text-output textarea {
@@ -263,61 +208,6 @@
   margin-top: 5px;
 }
 
-/* 各入力ブロックが縦に並ぶようにする */
-.exclude-section {
-  margin-top: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.input-block {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.input-block label {
-  display: block;
-  font-size: 0.8rem;
-  font-weight: bold;
-}
-
-.input-block input[type="text"] {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.inline-input {
-  display: flex;
-  gap: 5px;
-}
-
-.add-btn {
-  background-color: #e91e63;
-  color: white;
-  border: none;
-  padding: 0 15px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-/* コピーボタン */
-.main-copy-btn {
-  width: 100%;
-  background: #e91e63;
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 4px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
 .user-list-container {
   display: flex;
   flex-direction: column;
@@ -374,15 +264,6 @@
   color: white;
 }
 
-.tool-title {
-  font-size: 1.5rem;
-  color: #333;
-  margin-bottom: 20px;
-  border-left: 5px solid #e91e63;
-  padding-left: 15px;
-  line-height: 1.2;
-}
-
 /* コンテナをFlexboxにして、中身を横いっぱいに広げる */
 .growth-container {
   display: flex;
@@ -399,74 +280,10 @@
 
 /* 画面幅が狭い時（スマホ・タブレット等）の調整 */
 @media (max-width: 900px) {
-  /* 1. タイトルが縦長に潰れるのを防ぐ */
-  .tool-title {
-    white-space: nowrap; /* 改行させない */
-    font-size: 1.2rem; /* 少し小さくして収める */
-  }
-
-  /* 2. 横並び(flex)を縦並び(column)に変更 */
-  .page-container {
-    flex-direction: column;
-    padding: 10px 15px; /* 左右の余白を削って画面を有効活用 */
-  }
-
-  /* 3. サイドバーを画面幅いっぱいに広げる */
-  .sidebar {
-    width: 100% !important;
-    position: static; /* 画面に固定するのをやめる */
-    order: -1; /* サイドバー（設定項目）を上に持ってくる場合はこれを入れる */
-    margin-bottom: 20px;
-  }
-
-  /* 4. メインエリア（ログ表示）も幅100%に */
-  .growth-main {
-    width: 100%;
-  }
-
-  /* 5. ログが横にはみ出さないように調整 */
+  /* ログが横にはみ出さないように調整 */
   .log-line {
     white-space: normal; /* 折り返しを許可 */
     word-break: break-all;
     padding-left: 1em;
   }
-}
-
-.update-history {
-  margin-top: 40px;
-  padding: 20px;
-  background: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-}
-
-.update-history h3 {
-  font-size: 1rem;
-  color: #333;
-  margin-bottom: 10px;
-  border-bottom: 2px solid #e91e63;
-  display: inline-block;
-}
-
-.history-container {
-  max-height: 150px;
-  overflow-y: auto; /* 履歴が増えても邪魔にならないようスクロール可能に */
-  font-size: 0.85rem;
-  color: #666;
-}
-
-.history-container ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.history-container li {
-  padding: 4px 0;
-  border-bottom: 1px dashed #eee;
-}
-
-.history-container li strong {
-  color: #333;
-  margin-right: 10px;
 }

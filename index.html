@@ -8,28 +8,19 @@
     <link rel="icon" href="image/hpicon.png" sizes="any" />
     <link rel="apple-touch-icon" href="image/hpicon.png" sizes="256x256" />
     <link rel="icon" type="image/png" href="image/hpicon.png" sizes="256x256" />
+    <script src="js/include.js" defer></script>
   </head>
 
   <body>
-    <header>
-      <div class="logo"><a href="index.html">しいたけTOOLs</a></div>
-      <nav>
-        <ul>
-          <li><a href="#dice">ダイス</a></li>
-          <li><a href="GrowthTool/growth.html">成長チェック</a></li>
-          <li><a href="Order/order.html">依頼テンプレート</a></li>
-          <li><a href="Download/download.html">ダウンロード</a></li>
-        </ul>
-      </nav>
-    </header>
+    <div data-include="components/header.html"></div>
 
     <main>
       <div class="grid">
-        <section class="card" id="dice">
-          <div class="icon">🎲</div>
-          <h2>ダイスツール</h2>
-          <p>近日作成</p>
-          <a href="#" class="btn">ツールを開く</a>
+        <section class="card" id="schedule">
+          <div class="icon">🗓️</div>
+          <h2>日程調整ツール</h2>
+          <p>簡易的に日程調整を行うツールです。</p>
+          <a href="ScheduleTool/schedule_tool.html" class="btn">ツールを開く</a>
         </section>
 
         <section class="card" id="growth">
@@ -55,11 +46,6 @@
       </div>
     </main>
 
-    <footer>
-      <p>
-        &copy; 2026 椎(<a href="https://x.com/siiii_nemui">@siiii_nemui</a>).
-        All Rights Reserved.
-      </p>
-    </footer>
+    <div data-include="components/footer.html"></div>
   </body>
 </html>
