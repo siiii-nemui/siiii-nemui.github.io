@@ -1,11 +1,551 @@
 /* ScheduleTool/schedule_tool.css */
 
-h1 {
-  color: #333;
+.schedule-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  padding: 65px 20px 0 20px; /* ヘッダーの高さに合わせて上部にパディングを追加 */
+}
+
+.calendar-section {
+  background: #eeeeee;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.selected-dates-section {
+  background: #eeeeee;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+/* カレンダーのスタイル */
+#calendar-container {
+  font-family: Arial, sans-serif;
+  max-width: 400px;
+  margin: 0 auto;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.calendar-controls {
+  display: flex;
+  justify-content: flex-start; /* 左寄せ */
+  align-items: center;
+  padding: 10px 15px;
+  background-color: #f0f0f0;
+  gap: 15px; /* 要素間のスペース */
+  flex-wrap: wrap; /* 小さい画面で折り返す */
+}
+
+.options-button {
+  background-color: #e91e63; /* 赤色に統一 */
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-left: auto; /* 右端に寄せる */
+}
+
+.options-button:hover {
+  opacity: 0.9;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #333;
+  color: white;
+  padding: 10px 15px;
+}
+
+.calendar-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.calendar-header button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.calendar-header button:hover {
+  background-color: #555;
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background-color: #f0f0f0;
+  padding: 10px 0;
+  text-align: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.weekdays div {
+  color: #555;
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 10px;
   text-align: center;
 }
 
-p {
-  text-align: center;
-  font-size: 1.2em;
+.day,
+.empty-day {
+  padding: 10px 5px;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  margin: 2px;
+}
+
+.day {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  position: relative;
+}
+
+.day:hover {
+  background-color: #e0e0e0;
+}
+
+/* 選択された日付のスタイル */
+.day.selected {
+  background-color: #00c853; /* 画像のような緑色 */
+  color: white;
+  font-weight: bold;
+}
+
+/* 範囲選択の開始日と終了日を示す白い丸 */
+.day.selected.range-start,
+.day.selected.range-end {
+  position: relative;
+  z-index: 1; /* 日付が円の上に表示されるように */
+  color: #00c853; /* 白い円の上でも視認できる色に */
+}
+
+.day.selected.range-start::before,
+.day.selected.range-end::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30px; /* 円のサイズ */
+  height: 30px;
+  background-color: white; /* 白い円 */
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1; /* 日付のテキストの下に */
+  border: 2px solid #00c853; /* 緑の枠線 */
+}
+
+/* 範囲内だが、開始日でも終了日でもない日付のスタイル */
+.day.selected:not(.range-start):not(.range-end) {
+  background-color: #00c853; /* 範囲内の色 */
+  color: white;
+}
+
+.empty-day {
+  color: #ccc;
+}
+
+.selected-dates-section label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+#selected-dates {
+  width: 100%;
+  font-size: 0.9rem;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  resize: vertical; /* ユーザーによるリサイズを許可 */
+  margin-bottom: 10px;
+  flex-grow: 1; /* 親要素の高さに合わせて伸長 */
+  min-height: 150px; /* 最小高さを設定 */
+}
+
+#copy-button {
+  background-color: #e91e63;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  float: right; /* 右寄せ */
+}
+
+#copy-button:hover {
+  opacity: 0.8;
+}
+
+.date-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+  justify-content: flex-end; /* 右寄せ */
+}
+
+.date-controls #copy-button {
+  background-color: #e91e63;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.date-controls #copy-button:hover {
+  opacity: 0.8;
+}
+
+/* レスポンシブ対応 */
+.schedule-content {
+  display: flex;
+  flex-direction: column; /* デフォルトは縦並び */
+  gap: 5px; /* セクション間のスペースを5pxに変更 */
+}
+
+@media (min-width: 901px) {
+  /* 広い画面幅の場合 */
+  .schedule-content {
+  }
+
+  .calendar-section {
+    flex: 1; /* 残りのスペースを埋める */
+    max-width: none; /* 最大幅の制限を解除 */
+  }
+
+  .schedule-main {
+    flex: 1; /* 左側のコンテンツが残りのスペースを埋める */
+  }
+  .selected-dates-section {
+    width: 350px; /* 固定幅 */
+    flex-shrink: 0; /* 縮まないようにする */
+    position: sticky; /* スクロール追従 */
+    top: 75px; /* ヘッダー下から */
+    bottom: 125px;
+    max-height: calc(
+      100vh - 75px - 85px - 20px
+    ); /* ヘッダー, フッター, 上下のマージンを考慮 */
+    overflow-y: auto; /* スクロール可能にする */
+  }
+}
+
+@media (max-width: 900px) {
+  .selected-dates-section {
+    position: static; /* 小さい画面では通常の配置に戻す */
+    width: 95%; /* 画面横幅いっぱいに設定 */
+    top: auto;
+    right: auto;
+    bottom: auto;
+    height: auto;
+    overflow-y: visible;
+  }
+  .schedule-content {
+    gap: 20px; /* カレンダー・日程詳細と日程一覧のマージン */
+  }
+}
+
+@media (max-width: 768px) {
+  .calendar-section,
+  .selected-dates-section {
+    padding: 15px;
+  }
+
+  #copy-button {
+    width: 100%;
+    float: none;
+  }
+}
+
+.options-panel {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 15px;
+  margin-bottom: 20px; /* 時間設定とカレンダーのマージン */
+  display: none; /* activeクラスがない場合は非表示 */
+  flex-direction: column;
+  gap: 10px;
+}
+
+.options-panel.active {
+  display: flex; /* アクティブ時に表示 */
+}
+
+.options-panel h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.options-panel .time-setting {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.options-panel label {
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.options-panel input[type="time"] {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.options-panel button {
+  background-color: #28a745; /* 緑色 */
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  align-self: flex-end; /* 右寄せ */
+}
+
+.options-panel button:hover {
+  opacity: 0.9;
+}
+
+.bulk-time-selection {
+  display: flex;
+  gap: 8px; /* ボタン間のスペース */
+  margin-bottom: 15px; /* 下の要素との余白 */
+  justify-content: center; /* 中央寄せ */
+}
+
+.bulk-time-button {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: white;
+  transition: opacity 0.2s;
+}
+
+.bulk-time-button:hover {
+  opacity: 0.8;
+}
+
+.bulk-time-button[data-bulk-type="all"] {
+  background-color: #e91e63; /* 赤色 */
+}
+
+.bulk-time-button[data-bulk-type="day"] {
+  background-color: #4caf50; /* 緑色 */
+}
+
+.bulk-time-button[data-bulk-type="night"] {
+  background-color: #ffeb3b; /* 黄色 */
+  color: #333; /* 文字色を黒に */
+}
+
+.bulk-time-button.clear-all {
+  background-color: #f44336; /* 赤色 */
+}
+
+.bulk-settings-panel {
+  margin-top: 20px; /* 上の要素との余白 */
+}
+
+#bulk-options-toggle {
+  /* options-buttonと同じスタイルを適用 */
+  margin-left: auto; /* 右寄せ */
+  display: block; /* ブロック要素にして幅いっぱいに */
+  width: fit-content; /* 内容に合わせた幅 */
+  margin-bottom: 15px; /* 下のパネルとの余白 */
+}
+
+#bulk-options-content {
+  /* options-panelと同じスタイルを適用 */
+  margin-bottom: 20px; /* カレンダーとの余白 */
+}
+
+.weekday-checkboxes {
+  display: flex;
+  flex-wrap: wrap; /* 小さい画面で折り返す */
+  gap: 10px; /* チェックボックス間のスペース */
+  margin-bottom: 15px;
+  justify-content: center;
+}
+
+.weekday-checkboxes label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #555;
+}
+
+.bulk-action-controls {
+  display: flex;
+  flex-direction: column; /* 縦並び */
+  gap: 10px; /* 要素間のスペース */
+  align-items: center; /* 中央寄せ */
+  margin-bottom: 15px;
+}
+
+#unselected-only {
+  /* チェックボックスのデフォルトスタイルを維持 */
+  margin-right: 5px;
+}
+
+#clear-selected-weekdays-dates {
+  background-color: #2196f3; /* 青色 */
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transition: opacity 0.2s;
+  width: fit-content; /* 内容に合わせた幅 */
+  margin: 0 auto; /* 中央寄せ */
+  display: block; /* ブロック要素 */
+}
+
+#clear-selected-weekdays-dates:hover {
+  opacity: 0.8;
+}
+
+.selected-dates-list-container {
+  background: #eeeeee;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.selected-dates-list-container h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.selected-dates-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.selected-date-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.selected-date-item:last-child {
+  border-bottom: none;
+}
+
+.selected-date-item .date-info {
+  font-weight: bold;
+  color: #333;
+  flex-basis: 30%; /* 日付情報の幅 */
+}
+
+.selected-date-item .time-type-select-buttons {
+  display: flex;
+  gap: 5px;
+  flex-basis: 70%; /* 時間タイプ選択の幅 */
+  justify-content: flex-end; /* 右寄せ */
+}
+
+.time-type-button {
+  background-color: #f0f0f0; /* デフォルトの背景色 */
+  color: #333; /* デフォルトの文字色 */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+/* 選択中のボタンのスタイル */
+.time-type-button.active-all {
+  background-color: #e91e63; /* 全日: コピーボタンの赤 */
+  color: white;
+  border-color: #e91e63;
+}
+
+.time-type-button.active-day {
+  background-color: #e91e63; /* 昼: コピーボタンの赤 */
+  color: white;
+  border-color: #e91e63;
+}
+
+.time-type-button.active-night {
+  background-color: #e91e63; /* 夜: コピーボタンの赤 */
+  color: white;
+  border-color: #e91e63;
+}
+
+.time-type-button:hover {
+  opacity: 0.9;
+}
+
+.selection-mode-buttons {
+  display: flex;
+  gap: 5px; /* ボタン間のスペース */
+}
+
+.mode-button {
+  background-color: #f0f0f0; /* デフォルトの背景色 */
+  color: #333; /* デフォルトの文字色 */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px 15px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.mode-button.active {
+  background-color: #e91e63; /* 選択中の色 (コピーボタンの赤) */
+  color: white;
+  border-color: #e91e63;
+}
+
+.mode-button:hover {
+  opacity: 0.9;
 }

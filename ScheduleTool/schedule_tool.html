@@ -4,11 +4,138 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>日程調整ツール</title>
+
+    <link rel="stylesheet" href="../style.css" />
     <link rel="stylesheet" href="schedule_tool.css" />
+
+    <link rel="icon" href="../image/hpicon.png" sizes="any" />
+    <link rel="apple-touch-icon" href="../image/hpicon.png" sizes="256x256" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="../image/hpicon.png"
+      sizes="256x256"
+    />
+    <script src="../js/include.js" defer></script>
   </head>
+
   <body>
-    <h1>日程調整ツール</h1>
-    <p>このページは日程調整ツールの仮ページです。</p>
+    <div data-include="../components/header.html"></div>
+
+    <div class="page-container">
+      <main class="schedule-main">
+        <h1 class="tool-title">日程調整ツール</h1>
+
+        <div class="schedule-content">
+          <div class="calendar-section">
+            <div class="calendar-controls">
+              <div class="selection-mode-buttons">
+                <button
+                  class="mode-button active"
+                  id="range-select-button"
+                  data-mode="range"
+                >
+                  期間選択
+                </button>
+                <button
+                  class="mode-button"
+                  id="single-select-button"
+                  data-mode="single"
+                >
+                  単一選択
+                </button>
+              </div>
+              <button id="options-button" class="options-button">
+                時間設定
+              </button>
+            </div>
+            <div id="options-panel" class="options-panel active">
+              <h3>時間設定</h3>
+              <div class="time-setting">
+                <label for="day-start">昼開始:</label>
+                <input type="time" id="day-start" value="13:00" />
+                <label for="day-end">昼終了:</label>
+                <input type="time" id="day-end" value="18:00" />
+              </div>
+              <div class="time-setting">
+                <label for="night-start">夜開始:</label>
+                <input type="time" id="night-start" value="21:00" />
+                <label for="night-end">夜終了:</label>
+                <input type="time" id="night-end" value="00:00" />
+                <span id="night-end-24h-display"></span>
+              </div>
+              <button id="apply-time-settings">設定を適用</button>
+            </div>
+            <div id="calendar-container"></div>
+            <div class="bulk-settings-panel">
+              <button id="bulk-options-toggle" class="options-button">
+                一括入力ボタン
+              </button>
+              <div id="bulk-options-content" class="options-panel">
+                <h3>一括設定</h3>
+                <div class="weekday-checkboxes">
+                  <label><input type="checkbox" data-day="0" />日</label>
+                  <label><input type="checkbox" data-day="1" />月</label>
+                  <label><input type="checkbox" data-day="2" />火</label>
+                  <label><input type="checkbox" data-day="3" />水</label>
+                  <label><input type="checkbox" data-day="4" />木</label>
+                  <label><input type="checkbox" data-day="5" />金</label>
+                  <label><input type="checkbox" data-day="6" />土</label>
+                  <label
+                    ><input
+                      type="checkbox"
+                      id="select-all-weekdays"
+                    />全て</label
+                  >
+                </div>
+                <div class="bulk-action-controls">
+                  <label>
+                    <input type="checkbox" id="unselected-only" />未選択のみ
+                  </label>
+                  <div class="bulk-time-selection">
+                    <button class="bulk-time-button" data-bulk-type="all">
+                      全
+                    </button>
+                    <button class="bulk-time-button" data-bulk-type="day">
+                      昼
+                    </button>
+                    <button class="bulk-time-button" data-bulk-type="night">
+                      夜
+                    </button>
+                  </div>
+                </div>
+                <button id="clear-selected-weekdays-dates">
+                  選択した曜日の日程をクリア
+                </button>
+              </div>
+            </div>
+            <div id="selected-dates-list-container"></div>
+
+            <!-- ここに新しい要素を追加 -->
+          </div>
+        </div>
+      </main>
+      <aside class="selected-dates-section">
+        <label for="selected-dates">選択された日時</label>
+
+        <textarea id="selected-dates" rows="10" readonly></textarea>
+        <div class="date-controls">
+          <button id="copy-button">コピー</button>
+        </div>
+      </aside>
+    </div>
+
+    <section class="update-history">
+      <h3>更新履歴</h3>
+      <div class="history-container">
+        <ul>
+          <li><strong>2026/06/01</strong> - 日程調整ツール 公開</li>
+        </ul>
+      </div>
+    </section>
+
+    <div data-include="../components/footer.html"></div>
+
     <script src="schedule_tool.js"></script>
   </body>
 </html>

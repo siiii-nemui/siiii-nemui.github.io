@@ -82,7 +82,7 @@ main {
   width: 100%;
   max-width: 95%;
   margin: 0 auto;
-  padding: 80px 1.5rem 1rem;
+  padding: 65px 1.5rem 1rem; /* ヘッダーの高さに合わせて調整 */
   box-sizing: border-box;
 }
 
@@ -166,13 +166,13 @@ footer a {
 /* 共通コンテナ・レイアウト */
 .page-container {
   display: flex;
-  max-width: 100% !important;
-  margin: 0 70px;
-  padding: 10px 40px;
+  margin: 0 auto; /* 中央寄せ */
+  padding: 10px 0; /* 左右の余白を調整 (schedule-mainで調整) */
   gap: 30px;
   width: 100%;
   box-sizing: border-box;
   align-items: flex-start;
+  max-width: 1200px; /* 追加: 全体の最大幅を設定 */
 }
 
 /* メインコンテンツエリア */
