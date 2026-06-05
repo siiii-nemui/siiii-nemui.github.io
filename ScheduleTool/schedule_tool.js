@@ -352,13 +352,10 @@ function selectDate(dateString, event) {
   saveHistory(); // 変更前に現在の状態を履歴に保存
 
   if (selectionMode === "single") {
-    // 単一選択モードの場合
+    // 単一選択モードの場合は、クリックした日をトグルで選択/解除
     if (selectedDates[dateString]) {
-      // 既に選択されている場合は時間設定をnullにする (選択解除) または全日を切り替える
-      selectedDates[dateString].timeType =
-        selectedDates[dateString].timeType !== null ? null : "all"; // 無選択と全日を切り替える
+      delete selectedDates[dateString];
     } else {
-      // 新規選択時はデフォルト無選択で追加
       selectedDates[dateString] = { timeType: null };
     }
     selectingRange = false; // 単一選択モードでは範囲選択をリセット
