@@ -7,8 +7,7 @@ const selectedDatesTextarea = document.getElementById("selected-dates");
 const copyButton = document.getElementById("copy-button");
 
 // モード選択ボタン
-const rangeSelectButton = document.getElementById("range-select-button");
-const singleSelectButton = document.getElementById("single-select-button");
+
 
 const optionsButton = document.getElementById("options-button");
 const optionsPanel = document.getElementById("options-panel");
@@ -40,80 +39,63 @@ let currentMonth = new Date().getMonth(); // 0-indexed
 // selectedDatesのtimeTypeを常に保持し、初期値は常にnullで、クリック時に初めてtimeTypeが設定される
 let selectedDates = {}; // { "YYYY-MM-DD": { timeType: "all" | "day" | "night" | "none" } }
 let selectedDatesHistory = []; // Undo機能のための履歴
-let selectionMode = "range"; // デフォルトは期間選択
 let selectingRange = false; // 範囲選択中かどうか
 let rangeStartDate = null; // 範囲選択の開始日
+let isDragging = false; // ドラッグ中かどうかを追跡
 
-let dayTimeStart = 13;
-let dayTimeEnd = 18;
-let nightTimeStart = 21;
-let nightTimeEnd = 24; // デフォルトは24:00
+let dayTimeStartHour = 13;
+let dayTimeStartMinute = 0;
+let dayTimeEndHour = 18;
+let dayTimeEndMinute = 0;
+let nightTimeStartHour = 21;
+let nightTimeStartMinute = 0;
+let nightTimeEndHour = 24; // デフォルトは24:00 (翌日00:00)
+let nightTimeEndMinute = 0;
 
-// 履歴を保存する関数
-function saveHistory() {
-  selectedDatesHistory.push(JSON.parse(JSON.stringify(selectedDates)));
-  // 履歴が大きくなりすぎないように制限
-  if (selectedDatesHistory.length > 20) {
-    selectedDatesHistory.shift();
-  }
-}
 
-// モード選択ボタンのイベントリスナー
-rangeSelectButton.addEventListener("click", () => {
-  selectionMode = "range";
-  rangeSelectButton.classList.add("active");
-  singleSelectButton.classList.remove("active");
-  selectingRange = false; // モード切り替え時に範囲選択状態をリセット
-  rangeStartDate = null;
-  selectedDates = {}; // 日付一覧をリセット
-  renderCalendar(); // モード変更時にカレンダーを再描画して状態を反映
-});
-
-singleSelectButton.addEventListener("click", () => {
-  selectionMode = "single";
-  singleSelectButton.classList.add("active");
-  rangeSelectButton.classList.remove("active");
-  selectingRange = false; // モード切り替え時に範囲選択状態をリセット
-  rangeStartDate = null;
-  selectedDates = {}; // 日付一覧をリセット
-  renderCalendar(); // モード変更時にカレンダーを再描画して状態を反映
-});
 
 // 時間設定ボタンのイベントリスナー
 optionsButton.addEventListener("click", () => {
   optionsPanel.classList.toggle("active");
-  // 現在の時間設定をパネルに表示
-  dayStartTimeInput.value = `${String(dayTimeStart).padStart(2, "0")}:00`;
-  dayEndTimeInput.value = `${String(dayTimeEnd).padStart(2, "0")}:00`;
-  nightStartTimeInput.value = `${String(nightTimeStart).padStart(2, "0")}:00`;
-
-  // nightTimeEndが24の場合は"00:00"と表示し、隣に"(24:00)"と補足
-  let displayNightEndTime = nightTimeEnd;
-  if (nightTimeEnd >= 24) {
-    displayNightEndTime = nightTimeEnd - 24; // 24時以降は00時から数え直す
-  }
-  nightEndTimeInput.value = `${String(displayNightEndTime).padStart(2, "0")}:00`;
-  nightEnd24hDisplay.textContent = "";
+  // トグル時に値を上書きしないように削除
 });
 
 // 時間設定適用ボタンのイベントリスナー
-applyTimeSettingsButton.addEventListener("click", () => {
-  dayTimeStart = parseInt(dayStartTimeInput.value.split(":")[0]);
-  dayTimeEnd = parseInt(dayEndTimeInput.value.split(":")[0]);
-  nightTimeStart = parseInt(nightStartTimeInput.value.split(":")[0]);
-  let tempNightTimeEnd = parseInt(nightEndTimeInput.value.split(":")[0]);
+applyTimeSettingsButton.addEventListener("click", applyTimeSettings);
+
+// 各inputタグの値が変更された際にも自動で適用する
+[dayStartTimeInput, dayEndTimeInput, nightStartTimeInput, nightEndTimeInput].forEach(input => {
+  input.addEventListener("change", applyTimeSettings);
+});
+
+function applyTimeSettings() {
+  dayTimeStartHour = parseInt(dayStartTimeInput.value.split(":")[0], 10) || 0;
+  dayTimeStartMinute = parseInt(dayStartTimeInput.value.split(":")[1], 10) || 0;
+  dayTimeEndHour = parseInt(dayEndTimeInput.value.split(":")[0], 10) || 0;
+  dayTimeEndMinute = parseInt(dayEndTimeInput.value.split(":")[1], 10) || 0;
+  nightTimeStartHour = parseInt(nightStartTimeInput.value.split(":")[0], 10) || 0;
+  nightTimeStartMinute = parseInt(nightStartTimeInput.value.split(":")[1], 10) || 0;
+
+  let tempNightTimeEndHour = parseInt(nightEndTimeInput.value.split(":")[0], 10) || 0;
+  let tempNightTimeEndMinute = parseInt(nightEndTimeInput.value.split(":")[1], 10) || 0;
+
   // 夜終了時刻が夜開始時刻より小さい場合は翌日と判断し、24を加算
-  if (tempNightTimeEnd < nightTimeStart) {
-    nightTimeEnd = tempNightTimeEnd + 24;
+  // Convert to total minutes for comparison
+  let nightStartTotalMinutes = nightTimeStartHour * 60 + nightTimeStartMinute;
+  let nightEndTotalMinutes = tempNightTimeEndHour * 60 + tempNightTimeEndMinute;
+
+  if (nightEndTotalMinutes < nightStartTotalMinutes) {
+    nightTimeEndHour = tempNightTimeEndHour + 24;
   } else {
-    nightTimeEnd = tempNightTimeEnd;
+    nightTimeEndHour = tempNightTimeEndHour;
   }
+  nightTimeEndMinute = tempNightTimeEndMinute;
 
   // 時間の整合性チェック（例：開始時刻が終了時刻より前かなど）は省略
 
   updateSelectedDatesTextarea(); // 日程一覧を更新
   renderSelectedDatesList(); // リスト表示も更新
-});
+}
 
 // 一括選択ボタンのイベントリスナー
 bulkTimeButtons.forEach((button) => {
@@ -247,28 +229,23 @@ function renderCalendar() {
     dayElement.dataset.date = dateString;
 
     // selectedDatesに存在する日付は選択クラスを付与
-    if (selectedDates[dateString]) {
-      dayElement.classList.add("selected");
-      // 範囲選択モードの場合のみ、開始日と終了日のクラスを追加
-      if (selectionMode === "range" && !selectingRange) {
+      if (selectedDates[dateString]) {
+        dayElement.classList.add("selected");
         // 範囲選択完了後のみ始点終点を表示
         // selectedDatesに存在するすべての日付を対象に始点終点を判断
         const sortedDates = Object.keys(selectedDates).sort();
         if (sortedDates.length > 0 && dateString === sortedDates[0]) {
           dayElement.classList.add("range-start");
         }
-        if (
-          sortedDates.length > 0 &&
-          dateString === sortedDates[sortedDates.length - 1]
-        ) {
+        if (sortedDates.length > 0 && dateString === sortedDates[sortedDates.length - 1]) {
           dayElement.classList.add("range-end");
         }
       }
-    }
 
-    dayElement.addEventListener("click", (event) =>
-      selectDate(dateString, event),
-    );
+    dayElement.addEventListener("mousedown", (event) => handleMouseDown(dateString, event));
+    dayElement.addEventListener("mouseover", () => handleMouseOver(dateString));
+    dayElement.addEventListener("mouseup", () => handleMouseUp(dateString));
+
     daysGrid.appendChild(dayElement);
   }
 
@@ -347,61 +324,99 @@ function renderSelectedDatesList() {
   });
 }
 
-// 日付選択ロジック
-function selectDate(dateString, event) {
-  saveHistory(); // 変更前に現在の状態を履歴に保存
+let dragBaseState = null;
 
-  if (selectionMode === "single") {
-    // 単一選択モードの場合は、クリックした日をトグルで選択/解除
-    if (selectedDates[dateString]) {
-      delete selectedDates[dateString];
-    } else {
-      selectedDates[dateString] = { timeType: null };
-    }
-    selectingRange = false; // 単一選択モードでは範囲選択をリセット
-    rangeStartDate = null;
-  } else {
-    // rangeモード（範囲選択）
-    if (!selectingRange) {
-      // 範囲選択の開始 (1回目のクリック または 範囲選択完了後の再クリック)
-      rangeStartDate = dateString;
-      selectingRange = true;
-      // 選択し直した時点で日付一覧はリセット
-      selectedDates = {};
-      selectedDates[dateString] = { timeType: null }; // 開始日のみデフォルト無選択
-    } else {
-      // 範囲選択の終了 (2回目のクリック)
-      const endDate = dateString;
+function handleMouseDown(dateString, event) {
+  if (event.button === 0) {
+    // 左クリックの場合のみ処理
+    saveHistory();
+    rangeStartDate = dateString;
+    isDragging = false;
+    dragBaseState = { ...selectedDates }; // ドラッグ開始前の状態を保存
 
-      // 開始日と終了日の間のすべての日付を選択
-      const start = new Date(rangeStartDate);
-      const end = new Date(endDate);
+    document.addEventListener("mousemove", handleMouseMove);
+  }
+}
 
-      // 開始日と終了日の前後関係を考慮
-      const [actualStart, actualEnd] =
-        start <= end ? [start, end] : [end, start];
+function handleMouseMove(event) {
+  if (rangeStartDate) {
+    isDragging = true;
+    const dateElements = document.querySelectorAll(".day[data-date]");
+    dateElements.forEach((dayElement) => {
+      const rect = dayElement.getBoundingClientRect();
+      if (
+        event.clientX >= rect.left &&
+        event.clientX <= rect.right &&
+        event.clientY >= rect.top &&
+        event.clientY <= rect.bottom
+      ) {
+        handleMouseOver(dayElement.dataset.date);
+      }
+    });
+  }
+}
 
-      // 月を跨いでの選択を可能にするため、日付を1日ずつインクリメントして処理
-      let currentDate = new Date(actualStart);
-      while (currentDate <= actualEnd) {
-        const yyyy = currentDate.getFullYear();
-        const mm = String(currentDate.getMonth() + 1).padStart(2, "0");
-        const dd = String(currentDate.getDate()).padStart(2, "0");
-        const currentDateString = `${yyyy}-${mm}-${dd}`;
-        // 範囲内の日付はデフォルトで無選択として追加
+function handleMouseOver(dateString) {
+  if (rangeStartDate && isDragging && dragBaseState) {
+    const start = new Date(rangeStartDate);
+    const end = new Date(dateString);
+
+    const [actualStart, actualEnd] = start <= end ? [start, end] : [end, start];
+
+    // ベース状態を復元し、ドラッグ範囲を上書きする
+    selectedDates = { ...dragBaseState };
+    const targetState = dragBaseState[rangeStartDate] ? false : true; // 開始セルが選択されていれば解除、そうでなければ選択
+
+    let currentDate = new Date(actualStart);
+    while (currentDate <= actualEnd) {
+      const yyyy = currentDate.getFullYear();
+      const mm = String(currentDate.getMonth() + 1).padStart(2, "0");
+      const dd = String(currentDate.getDate()).padStart(2, "0");
+      const currentDateString = `${yyyy}-${mm}-${dd}`;
+      
+      if (targetState) {
         if (!selectedDates[currentDateString]) {
-          // 既に存在する場合はtimeTypeを保持
           selectedDates[currentDateString] = { timeType: null };
         }
-        currentDate.setDate(currentDate.getDate() + 1); // 次の日へ
+      } else {
+        delete selectedDates[currentDateString];
       }
-
-      selectingRange = false; // 範囲選択終了
-      rangeStartDate = null; // 開始日をリセット
+      currentDate.setDate(currentDate.getDate() + 1);
     }
+
+    renderCalendar();
   }
-  renderCalendar(); // カレンダーを再描画して選択状態を反映
 }
+
+function handleMouseUp(dateString) {
+  document.removeEventListener("mousemove", handleMouseMove);
+
+  if (rangeStartDate) {
+    if (!isDragging) {
+      // シングルクリック時は選択状態をトグル
+      if (selectedDates[dateString]) {
+        delete selectedDates[dateString];
+      } else {
+        selectedDates[dateString] = { timeType: null };
+      }
+    }
+    rangeStartDate = null;
+    isDragging = false;
+    dragBaseState = null;
+    renderCalendar(); // 最終的な選択状態を反映
+  }
+}
+
+// グローバルなmouseupイベントリスナーを追加して、カレンダー外でのドラッグ終了に対応
+document.addEventListener("mouseup", () => {
+  document.removeEventListener("mousemove", handleMouseMove);
+  if (rangeStartDate) {
+    rangeStartDate = null;
+    isDragging = false;
+    dragBaseState = null;
+    renderCalendar();
+  }
+});
 
 // 選択された日付をテキストエリアに表示
 function updateSelectedDatesTextarea() {
@@ -441,8 +456,8 @@ function updateSelectedDatesTextarea() {
       timeConfig.timeType !== "none"
     ) {
       if (timeConfig.timeType === "all" || timeConfig.timeType === "day") {
-        displayText += `${currentDayPrefix} ${String(dayTimeStart).padStart(2, "0")}：00～${String(dayTimeEnd).padStart(2, "0")}：00\n`;
-        totalHours += dayTimeEnd - dayTimeStart;
+        displayText += `${currentDayPrefix} ${String(dayTimeStartHour).padStart(2, "0")}：${String(dayTimeStartMinute).padStart(2, "0")}～${String(dayTimeEndHour).padStart(2, "0")}：${String(dayTimeEndMinute).padStart(2, "0")}\n`;
+        totalHours += (dayTimeEndHour + dayTimeEndMinute / 60) - (dayTimeStartHour + dayTimeStartMinute / 60);
         addedDayTime = true;
       }
 
@@ -455,8 +470,8 @@ function updateSelectedDatesTextarea() {
           // 昼の時間帯が追加されておらず、夜の時間帯がその日の最初に追加される場合
           displayText += currentDayPrefix;
         }
-        displayText += ` ${String(nightTimeStart).padStart(2, "0")}：00～${String(nightTimeEnd).padStart(2, "0")}：00\n`;
-        totalHours += nightTimeEnd - nightTimeStart;
+        displayText += ` ${String(nightTimeStartHour).padStart(2, "0")}:${String(nightTimeStartMinute).padStart(2, "0")}～${String(nightTimeEndHour).padStart(2, "0")}:${String(nightTimeEndMinute).padStart(2, "0")}\n`;
+        totalHours += (nightTimeEndHour + nightTimeEndMinute / 60) - (nightTimeStartHour + nightTimeStartMinute / 60);
       }
     } else {
       // timeType === null または timeType === 'none' の場合
@@ -481,3 +496,5 @@ copyButton.addEventListener("click", () => {
 
 // 初期カレンダー描画
 renderCalendar();
+
+function saveHistory() { selectedDatesHistory.push(JSON.parse(JSON.stringify(selectedDates))); }

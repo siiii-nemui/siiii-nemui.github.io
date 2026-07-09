@@ -26,25 +26,33 @@
       <main class="schedule-main">
         <h1 class="tool-title">日程調整ツール</h1>
 
+        <details class="tool-help">
+          <summary>使い方ガイド (Help)</summary>
+          <div class="help-content">
+            <ul>
+              <li>
+                <strong>日付の選択:</strong>
+                クリックで単一選択、ホールド＆ドラッグで範囲選択ができます。
+              </li>
+              <li>
+                <strong>時間の設定:</strong>
+                「時間設定」ボタンから、昼・夜の開始/終了時間を設定できます。
+              </li>
+              <li>
+                <strong>一括設定:</strong>
+                「一括入力ボタン」から特定の曜日や未選択のみに対して一括で時間を割り当てることができます。
+              </li>
+              <li>
+                <strong>出力:</strong>
+                右側(スマホは下部)のテキストエリアに結果が出力されます。「コピー」ボタンでクリップボードにコピーできます。
+              </li>
+            </ul>
+          </div>
+        </details>
+
         <div class="schedule-content">
           <div class="calendar-section">
             <div class="calendar-controls">
-              <div class="selection-mode-buttons">
-                <button
-                  class="mode-button active"
-                  id="range-select-button"
-                  data-mode="range"
-                >
-                  期間選択
-                </button>
-                <button
-                  class="mode-button"
-                  id="single-select-button"
-                  data-mode="single"
-                >
-                  単一選択
-                </button>
-              </div>
               <button id="options-button" class="options-button">
                 時間設定
               </button>
@@ -129,6 +137,10 @@
       <h3>更新履歴</h3>
       <div class="history-container">
         <ul>
+          <li>
+            <strong>2026/07/10</strong> -
+            日程選択方法の変更、Tipsの追加、バグ修正
+          </li>
           <li><strong>2026/06/01</strong> - 日程調整ツール 公開</li>
         </ul>
       </div>

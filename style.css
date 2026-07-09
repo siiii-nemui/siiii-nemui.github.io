@@ -41,12 +41,20 @@ header {
 }
 
 .logo a {
+  display: flex;
+  align-items: center;
   color: var(--text-main);
   font-size: 1.25rem;
   font-weight: bold;
   letter-spacing: 0.05em;
-  /* ロゴリンクは下線なし、状態変化しない */
   text-decoration: none;
+}
+
+.logo a .site-icon {
+  height: 1.25em; /* 親のfont-sizeに合わせる */
+  width: auto;
+  margin-right: 8px;
+  vertical-align: middle;
 }
 
 /* ロゴリンクの訪問済み・アクティブ時も色を変えない */
@@ -82,7 +90,7 @@ main {
   width: 100%;
   max-width: 95%;
   margin: 0 auto;
-  padding: 65px 1.5rem 1rem; /* ヘッダーの高さに合わせて調整 */
+  padding: 80px 1.5rem 1rem; /* ヘッダーの高さに合わせて調整 */
   box-sizing: border-box;
 }
 

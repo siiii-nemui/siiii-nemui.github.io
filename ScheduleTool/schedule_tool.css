@@ -10,6 +10,60 @@
   padding: 65px 20px 0 20px; /* ヘッダーの高さに合わせて上部にパディングを追加 */
 }
 
+/* 使い方ガイド (Help) のスタイル */
+.tool-help {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px 15px;
+  margin-bottom: 5px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.tool-help summary {
+  font-weight: bold;
+  cursor: pointer;
+  color: #e91e63;
+  outline: none;
+  list-style: none; /* デフォルトの矢印を消す場合 */
+  position: relative;
+  padding-left: 20px;
+}
+
+.tool-help summary::-webkit-details-marker {
+  display: none; /* Safari向けのデフォルト矢印非表示 */
+}
+
+.tool-help summary::before {
+  content: "▶";
+  position: absolute;
+  left: 0;
+  font-size: 0.8rem;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.2s ease;
+}
+
+.tool-help[open] summary::before {
+  transform: translateY(-50%) rotate(90deg);
+}
+
+.help-content {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #444;
+  line-height: 1.5;
+}
+
+.help-content ul {
+  padding-left: 20px;
+  margin: 0;
+}
+
+.help-content li {
+  margin-bottom: 5px;
+}
+
 .calendar-section {
   background: #eeeeee;
   border-radius: 8px;
@@ -522,30 +576,4 @@
   opacity: 0.9;
 }
 
-.selection-mode-buttons {
-  display: flex;
-  gap: 5px; /* ボタン間のスペース */
-}
 
-.mode-button {
-  background-color: #f0f0f0; /* デフォルトの背景色 */
-  color: #333; /* デフォルトの文字色 */
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 8px 15px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition:
-    background-color 0.2s,
-    color 0.2s;
-}
-
-.mode-button.active {
-  background-color: #e91e63; /* 選択中の色 (コピーボタンの赤) */
-  color: white;
-  border-color: #e91e63;
-}
-
-.mode-button:hover {
-  opacity: 0.9;
-}
