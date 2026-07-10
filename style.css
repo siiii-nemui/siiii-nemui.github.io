@@ -221,7 +221,7 @@ footer a {
 }
 
 /* 共通ボタン（マゼンタピンク） */
-.main-btn {
+.main-btn, .main-copy-btn {
   width: 100%;
   background: #e91e63;
   color: white;
@@ -231,9 +231,10 @@ footer a {
   font-weight: bold;
   cursor: pointer;
   transition: opacity 0.2s;
+  box-sizing: border-box;
 }
 
-.main-btn:hover {
+.main-btn:hover, .main-copy-btn:hover {
   opacity: 0.9;
 }
 
