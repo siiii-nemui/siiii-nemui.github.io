@@ -247,51 +247,79 @@ function applyFilters() {
         else if (type === "other" && !ui.failure) isHidden = true;
       }
 
-      // 3. これまでの全てのフィルタをパスしたものだけ、重複チェックを行う
-      if (!isHidden && ui.unique) {
-        let skillName = "";
-
-        // まずは【 】の中身を探す（小さな棍棒などリスト外技能への対応）
-        const bracketMatch = skillDetail.match(/【(.*?)】/);
-        if (bracketMatch) {
-          skillName = bracketMatch[1];
-        } else {
-          // 括弧がない場合は、従来通りリストから探す（回避、目星など）
-          for (let s in initialValues) {
-            if (skillDetail.includes(s)) {
-              skillName = s;
-              break;
-            }
+      // 3. 技能名の抽出 (重複チェックなどに利用)
+      let skillName = "";
+      const bracketMatch = skillDetail.match(/【(.*?)】/);
+      if (bracketMatch) {
+        skillName = bracketMatch[1];
+      } else {
+        for (let s in initialValues) {
+          if (skillDetail.includes(s)) {
+            skillName = s;
+            break;
           }
         }
-
-        if (skillName) {
-          if (userSkillHistory[log.name].has(skillName)) {
-            isHidden = true; // 2回目以降なら隠す
-          } else {
-            userSkillHistory[log.name].add(skillName); // 初見の技能名を登録
-          }
+        if (!skillName) {
+          // リストにない場合（能力値ロールや独自技能など）、コマンド部分を除去して抽出
+          const cleanName = skillDetail.replace(/CCB?[^ ]+/, '').replace(/\(1D100.*/, '').trim();
+          skillName = cleanName || skillDetail;
         }
       }
 
-      return { type, isHidden };
+      return { type, isHidden, skillName };
     };
 
     if (log.isMulti) {
       displayLog.subResults = log.subResults.map((sub) => {
         const res = checkEntry(sub, log.title);
-        return { ...sub, type: res.type, isHidden: res.isHidden };
+        return { ...sub, type: res.type, isHidden: res.isHidden, skillName: res.skillName };
       });
     } else {
       const res = checkEntry(log, log.detail);
       displayLog.type = res.type;
       displayLog.isHidden = res.isHidden;
+      displayLog.skillName = res.skillName;
     }
 
     if (!filteredData[log.name]) filteredData[log.name] = {};
     if (!filteredData[log.name][log.tab]) filteredData[log.name][log.tab] = [];
     filteredData[log.name][log.tab].push(displayLog);
   });
+
+  // 4. 重複排除 (優先順位: 決定的成功 > 致命的失敗 > スペシャル > 初期値成功 > 成功 > その他)
+  if (ui.unique) {
+    const typePriority = { critical: 1, fumble: 2, special: 3, initial: 4, success: 5, other: 6 };
+    Object.keys(filteredData).forEach((userName) => {
+      let bestSkills = {};
+      
+      Object.values(filteredData[userName]).forEach((tabs) => {
+        tabs.forEach((log) => {
+          const processItem = (item) => {
+            if (item.isHidden || !item.skillName) return;
+            const prio = typePriority[item.type] || 99;
+            if (!bestSkills[item.skillName] || prio < bestSkills[item.skillName].priority) {
+              bestSkills[item.skillName] = { item: item, priority: prio };
+            }
+          };
+          if (log.isMulti) log.subResults.forEach(processItem);
+          else processItem(log);
+        });
+      });
+
+      Object.values(filteredData[userName]).forEach((tabs) => {
+        tabs.forEach((log) => {
+          const checkItem = (item) => {
+            if (item.isHidden || !item.skillName) return;
+            if (bestSkills[item.skillName].item !== item) {
+              item.isHidden = true;
+            }
+          };
+          if (log.isMulti) log.subResults.forEach(checkItem);
+          else checkItem(log);
+        });
+      });
+    });
+  }
 
   render(filteredData);
 }
@@ -382,7 +410,7 @@ function render(data) {
         }
       }
     } else {
-      const categories = { 決定的成功: [], 致命的失敗: [], 初期値成功: [] };
+      const categories = { 決定的成功: [], スペシャル: [], 致命的失敗: [], 初期値成功: [] };
       Object.values(tabs).forEach((logs) => {
         logs.forEach((log) => {
           if (log.isMulti) {
@@ -391,11 +419,13 @@ function render(data) {
               const label =
                 sub.type === "critical"
                   ? "決定的成功"
-                  : sub.type === "fumble"
-                    ? "致命的失敗"
-                    : sub.type === "initial"
-                      ? "初期値成功"
-                      : null;
+                  : sub.type === "special"
+                    ? "スペシャル"
+                    : sub.type === "fumble"
+                      ? "致命的失敗"
+                      : sub.type === "initial"
+                        ? "初期値成功"
+                        : null;
               if (label)
                 categories[label].push({ detail: sub.detail, type: sub.type });
             });
@@ -403,11 +433,13 @@ function render(data) {
             const label =
               log.type === "critical"
                 ? "決定的成功"
-                : log.type === "fumble"
-                  ? "致命的失敗"
-                  : log.type === "initial"
-                    ? "初期値成功"
-                    : null;
+                : log.type === "special"
+                  ? "スペシャル"
+                  : log.type === "fumble"
+                    ? "致命的失敗"
+                    : log.type === "initial"
+                      ? "初期値成功"
+                      : null;
             if (label)
               categories[label].push({ detail: log.detail, type: log.type });
           }
@@ -426,7 +458,7 @@ function render(data) {
     display.innerHTML += userHtml;
 
     // コピー用テキスト作成（isHidden を無視しないように修正）
-    const copyCats = { 決定的成功: [], 致命的失敗: [], 初期値成功: [] };
+    const copyCats = { 決定的成功: [], スペシャル: [], 致命的失敗: [], 初期値成功: [] };
     Object.values(tabs).forEach((logs) => {
       logs.forEach((log) => {
         if (log.isMulti) {
@@ -435,11 +467,13 @@ function render(data) {
             const label =
               sub.type === "critical"
                 ? "決定的成功"
-                : sub.type === "fumble"
-                  ? "致命的失敗"
-                  : sub.type === "initial"
-                    ? "初期値成功"
-                    : null;
+                : sub.type === "special"
+                  ? "スペシャル"
+                  : sub.type === "fumble"
+                    ? "致命的失敗"
+                    : sub.type === "initial"
+                      ? "初期値成功"
+                      : null;
             if (label)
               copyCats[label].push({
                 parentTitle: log.title,
@@ -450,11 +484,13 @@ function render(data) {
           const label =
             log.type === "critical"
               ? "決定的成功"
-              : log.type === "fumble"
-                ? "致命的失敗"
-                : log.type === "initial"
-                  ? "初期値成功"
-                  : null;
+              : log.type === "special"
+                ? "スペシャル"
+                : log.type === "fumble"
+                  ? "致命的失敗"
+                  : log.type === "initial"
+                    ? "初期値成功"
+                    : null;
           if (label)
             copyCats[label].push({ parentTitle: null, detail: log.detail });
         }

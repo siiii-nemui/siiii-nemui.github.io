@@ -44,6 +44,9 @@
 .critical {
   color: #2196f3;
 }
+.special {
+  color: #ff9800; /* オレンジ系の色を割り当て */
+}
 .fumble {
   color: #e91e63;
 }
