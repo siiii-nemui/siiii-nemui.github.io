@@ -144,11 +144,31 @@ function processLog(htmlContent) {
         }
       }
     } else {
-      // 通常ロール：CCBの後のカッコ等を柔軟に拾うように修正
-      const singleMatch = body.match(
-        /(CCB?.*?<=?(\d+).*?＞\s*(\d+)\s*＞\s*([^\s]+))/,
+      // 組み合わせロール（CBR/CBRB(自分の値,相手の値)）：出目1つを2つの目標値と比較する形式
+      const cbrMatch = body.match(
+        /(CBRB?\(\s*(\d+)\s*,\s*(\d+)\s*\)[^＞]*＞\s*(\d+)\s*\[\s*([^,\]]+?)\s*,\s*([^,\]]+?)\s*\]\s*＞\s*([^\s]+))/i,
       );
-      if (singleMatch) {
+      // 通常ロール：CCBの後のカッコ等を柔軟に拾うように修正
+      const singleMatch =
+        !cbrMatch &&
+        body.match(/(CCB?.*?<=?(\d+).*?＞\s*(\d+)\s*＞\s*([^\s]+))/);
+
+      if (cbrMatch) {
+        // 自分の値（1つ目の引数）側の結果を成長チェック判定に使用する
+        const [__, detail, selfTarget, , value, selfStatus] = cbrMatch;
+        rawLogData.push({
+          isDice: true,
+          tab,
+          name,
+          detail,
+          target: parseInt(selfTarget),
+          value: parseInt(value),
+          status: selfStatus,
+          isMulti: false,
+          fullText: text,
+          lineIndex: index,
+        });
+      } else if (singleMatch) {
         const [__, detail, target, value, status] = singleMatch;
         rawLogData.push({
           isDice: true,
@@ -261,7 +281,10 @@ function applyFilters() {
         }
         if (!skillName) {
           // リストにない場合（能力値ロールや独自技能など）、コマンド部分を除去して抽出
-          const cleanName = skillDetail.replace(/CCB?[^ ]+/, '').replace(/\(1D100.*/, '').trim();
+          const cleanName = skillDetail
+            .replace(/\(1[Dd]100.*/, '')
+            .replace(/^(CBRB?|CCB?)[^ ]*/i, '')
+            .trim();
           skillName = cleanName || skillDetail;
         }
       }
