@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>アイコン切り抜きツール | しいたけTOOLs</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="icon.css" />
+    <link rel="icon" href="../image/hpicon.png" sizes="any" />
+    <link rel="apple-touch-icon" href="../image/hpicon.png" sizes="256x256" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="../image/hpicon.png"
+      sizes="256x256"
+    />
+    <script src="../js/include.js" defer></script>
+  </head>
+  <body>
+    <div data-include="../components/header.html"></div>
+
+    <main class="icon-container">
+      <div class="tool-title-area">
+        <h1 class="tool-title">アイコン切り抜きツール</h1>
+        <p class="tool-subtitle">
+          立ち絵イラストから顔まわりを切り抜いて、アイコン画像を作成します。画像はブラウザ内でのみ処理され、外部には送信されません。
+        </p>
+      </div>
+
+      <div class="page-container">
+        <div class="icon-editor-side">
+          <section class="display-area icon-drop-area" id="drop-area">
+            <div id="empty-state" class="icon-empty-state">
+              <p>ここに画像をドラッグ&amp;ドロップ<br />または</p>
+              <label class="main-btn icon-file-btn">
+                ファイルを選択
+                <input
+                  type="file"
+                  id="file-input"
+                  accept="image/png"
+                  multiple
+                  hidden
+                />
+              </label>
+            </div>
+
+            <div id="stage-wrap" class="icon-stage-wrap" style="display: none">
+              <img id="stage-img" alt="編集中の立ち絵" draggable="false" />
+              <div id="crop-box" class="icon-crop-box">
+                <div class="icon-crop-handle" id="crop-handle"></div>
+              </div>
+            </div>
+          </section>
+
+          <p class="icon-hint" id="stage-hint" style="display: none">
+            画像をクリックすると枠がその位置に移動します。枠をドラッグして微調整、右下のハンドル（またはホイール）で拡大縮小できます。
+          </p>
+        </div>
+
+        <aside class="sidebar icon-sidebar">
+          <h3 class="category-label">読み込み画像一覧</h3>
+          <label class="main-btn icon-add-btn">
+            画像を追加
+            <input
+              type="file"
+              id="file-input-add"
+              accept="image/png"
+              multiple
+              hidden
+            />
+          </label>
+          <ul id="thumb-list" class="icon-thumb-list"></ul>
+
+          <div class="control-item">
+            <label>出力サイズ</label>
+            <span id="output-size-display">-</span>
+          </div>
+          <p class="icon-size-note">
+            枠の大きさに応じて、元画像と同じ解像度で自動的に算出されます（拡大縮小による劣化を防ぐため）。
+          </p>
+
+          <button class="main-btn icon-export-btn" id="export-btn" disabled>
+            一括書き出し (ZIP)
+          </button>
+          <p class="icon-status" id="status-text"></p>
+        </aside>
+      </div>
+    </main>
+
+    <section class="update-history">
+      <h3>更新履歴</h3>
+      <div class="history-container">
+        <ul>
+          <li><strong>2026/08/01</strong> - アイコン切り抜きツール 公開</li>
+        </ul>
+      </div>
+    </section>
+
+    <div data-include="../components/footer.html"></div>
+
+    <script src="icon.js"></script>
+  </body>
+</html>

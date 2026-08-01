@@ -1,0 +1,232 @@
+/* IconTool/icon.css */
+
+/* ページ全体の横並び構成 */
+.icon-container .page-container {
+  align-items: flex-start;
+}
+
+.icon-editor-side {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.icon-sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  background: #eeeeee;
+  border-radius: 8px;
+  padding: 20px;
+  position: sticky;
+  top: 80px;
+  height: fit-content;
+  box-sizing: border-box;
+}
+
+/* 編集ステージ */
+.icon-drop-area {
+  min-height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.icon-drop-area.dragover {
+  outline: 2px dashed #e91e63;
+  outline-offset: -6px;
+  background: rgba(233, 30, 99, 0.05);
+}
+
+.icon-empty-state {
+  text-align: center;
+  color: #666;
+}
+
+.icon-empty-state p {
+  margin-bottom: 15px;
+  line-height: 1.6;
+}
+
+.icon-file-btn,
+.icon-add-btn {
+  display: inline-block;
+  cursor: pointer;
+  width: auto;
+  padding: 10px 20px;
+}
+
+.icon-add-btn {
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.icon-stage-wrap {
+  position: relative;
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto;
+  user-select: none;
+  line-height: 0;
+  cursor: crosshair;
+}
+
+.icon-stage-wrap img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  /* 透過部分の視認性を上げるための市松模様 */
+  background-image:
+    linear-gradient(45deg, #ddd 25%, transparent 25%),
+    linear-gradient(-45deg, #ddd 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #ddd 75%),
+    linear-gradient(-45deg, transparent 75%, #ddd 75%);
+  background-size: 16px 16px;
+  background-position:
+    0 0,
+    0 8px,
+    8px -8px,
+    -8px 0;
+  background-color: #fff;
+}
+
+.icon-crop-box {
+  position: absolute;
+  border: 2px dashed #e91e63;
+  background: rgba(233, 30, 99, 0.12);
+  cursor: move;
+  box-sizing: border-box;
+}
+
+.icon-crop-handle {
+  position: absolute;
+  right: -7px;
+  bottom: -7px;
+  width: 14px;
+  height: 14px;
+  background: #e91e63;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  cursor: nwse-resize;
+}
+
+.icon-hint {
+  font-size: 0.8rem;
+  color: #888;
+  text-align: center;
+  margin: 0;
+}
+
+/* サムネイル一覧 */
+.icon-thumb-list {
+  list-style: none;
+  margin: 0 0 15px;
+  padding: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.icon-thumb-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  border-radius: 6px;
+  background: #fff;
+  border: 2px solid transparent;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.icon-thumb-item.active {
+  border-color: #e91e63;
+}
+
+.icon-thumb-thumb {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+  background-color: #fff;
+  background-image:
+    linear-gradient(45deg, #ddd 25%, transparent 25%),
+    linear-gradient(-45deg, #ddd 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #ddd 75%),
+    linear-gradient(-45deg, transparent 75%, #ddd 75%);
+  background-size: 10px 10px;
+  background-position:
+    0 0,
+    0 5px,
+    5px -5px,
+    -5px 0;
+}
+
+.icon-thumb-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.icon-thumb-remove {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 1rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px;
+}
+
+.icon-thumb-remove:hover {
+  color: #e91e63;
+}
+
+#output-size-display {
+  font-weight: bold;
+  font-size: 0.85rem;
+  color: #333;
+}
+
+.icon-size-note {
+  font-size: 0.75rem;
+  color: #888;
+  line-height: 1.5;
+  margin: 6px 0 0;
+}
+
+.icon-export-btn {
+  margin-top: 10px;
+}
+
+.icon-export-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.icon-status {
+  font-size: 0.8rem;
+  color: #666;
+  text-align: center;
+  margin: 10px 0 0;
+  min-height: 1.2em;
+}
+
+@media (max-width: 900px) {
+  .icon-sidebar {
+    width: 100% !important;
+    position: static !important;
+  }
+}
