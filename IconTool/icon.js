@@ -111,9 +111,11 @@ function createZip(files) {
 // ---- アイコン切り抜きエディタ本体 ----
 class IconEditor {
   constructor() {
-    this.images = []; // { id, file, name, url, img, naturalWidth, naturalHeight, crop:{x,y,size} }
+    this.images = []; // { id, file, name, url, img, naturalWidth, naturalHeight }
     this.currentId = null;
     this.minBoxPx = 20;
+    // 読み込んだ全画像に共通で適用される、単一の切り抜き位置(元画像のピクセル座標)
+    this.sharedCrop = null;
 
     this.initElements();
     this.bindEvents();
@@ -208,7 +210,6 @@ class IconEditor {
         img: null,
         naturalWidth: 0,
         naturalHeight: 0,
-        crop: null,
       });
 
       if (!this.currentId) this.currentId = id;
@@ -220,10 +221,13 @@ class IconEditor {
         entry.img = loader;
         entry.naturalWidth = loader.naturalWidth;
         entry.naturalHeight = loader.naturalHeight;
-        entry.crop = this.defaultCrop(
-          loader.naturalWidth,
-          loader.naturalHeight,
-        );
+        // 最初の1枚を基準に、全画像共通の切り抜き位置を初期化する
+        if (!this.sharedCrop) {
+          this.sharedCrop = this.defaultCrop(
+            loader.naturalWidth,
+            loader.naturalHeight,
+          );
+        }
         if (this.currentId === id) this.selectImage(id);
         this.renderThumbList();
         this.updateExportState();
@@ -269,6 +273,7 @@ class IconEditor {
         const next = this.images[Math.max(0, idx - 1)];
         this.selectImage(next.id);
       } else {
+        this.sharedCrop = null;
         this.showEmptyState();
       }
     }
@@ -324,9 +329,9 @@ class IconEditor {
   renderCropBox() {
     this.updateOutputSizeDisplay();
     const entry = this.currentImage;
-    if (!entry || !entry.crop || !this.stageImg.clientWidth) return;
+    if (!entry || !this.sharedCrop || !this.stageImg.clientWidth) return;
     const scale = this.stageImg.clientWidth / entry.naturalWidth;
-    const { x, y, size } = entry.crop;
+    const { x, y, size } = this.sharedCrop;
     this.cropBox.style.left = `${x * scale}px`;
     this.cropBox.style.top = `${y * scale}px`;
     this.cropBox.style.width = `${size * scale}px`;
@@ -334,12 +339,11 @@ class IconEditor {
   }
 
   updateOutputSizeDisplay() {
-    const entry = this.currentImage;
-    if (!entry || !entry.crop) {
+    if (!this.sharedCrop) {
       this.outputSizeDisplay.textContent = "-";
       return;
     }
-    const size = Math.round(entry.crop.size);
+    const size = Math.round(this.sharedCrop.size);
     this.outputSizeDisplay.textContent = `${size} × ${size} px`;
   }
 
@@ -358,7 +362,8 @@ class IconEditor {
     natX = Math.max(0, Math.min(natX, entry.naturalWidth - natSize));
     natY = Math.max(0, Math.min(natY, entry.naturalHeight - natSize));
 
-    entry.crop = { x: natX, y: natY, size: natSize };
+    // 現在表示中の画像を基準に調整するが、この位置は全画像に共通で適用される
+    this.sharedCrop = { x: natX, y: natY, size: natSize };
     this.renderCropBox();
   }
 
@@ -502,6 +507,18 @@ class IconEditor {
     this.statusText.textContent = text;
   }
 
+  // 共有の切り抜き位置を、対象画像のサイズに収まるようクランプする
+  // (通常は同一サイズの画像セットを想定しているため、クランプが効くのは
+  // サイズが異なる画像が混在する場合のみ)
+  getSourceCropFor(entry) {
+    const { x, y, size } = this.sharedCrop;
+    const maxSize = Math.min(entry.naturalWidth, entry.naturalHeight);
+    const clampedSize = Math.min(size, maxSize);
+    const clampedX = Math.max(0, Math.min(x, entry.naturalWidth - clampedSize));
+    const clampedY = Math.max(0, Math.min(y, entry.naturalHeight - clampedSize));
+    return { x: clampedX, y: clampedY, size: clampedSize };
+  }
+
   cropToBlob(entry, outputSize) {
     return new Promise((resolve) => {
       const canvas = document.createElement("canvas");
@@ -510,7 +527,7 @@ class IconEditor {
       const ctx = canvas.getContext("2d");
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = "high";
-      const { x, y, size } = entry.crop;
+      const { x, y, size } = this.getSourceCropFor(entry);
       ctx.drawImage(entry.img, x, y, size, size, 0, 0, outputSize, outputSize);
       canvas.toBlob((blob) => resolve(blob), "image/png");
     });
@@ -540,8 +557,8 @@ class IconEditor {
   }
 
   async exportAll() {
-    const ready = this.images.filter((it) => it.img && it.crop);
-    if (ready.length === 0) {
+    const ready = this.images.filter((it) => it.img);
+    if (!this.sharedCrop || ready.length === 0) {
       this.setStatus("書き出せる画像がありません。");
       return;
     }
@@ -549,11 +566,11 @@ class IconEditor {
     this.exportBtn.disabled = true;
     const usedNames = new Set();
     const files = [];
+    const outputSize = Math.round(this.sharedCrop.size);
 
     for (let i = 0; i < ready.length; i++) {
       const entry = ready[i];
       this.setStatus(`書き出し中... (${i + 1}/${ready.length})`);
-      const outputSize = Math.round(entry.crop.size);
       const blob = await this.cropToBlob(entry, outputSize);
       const buffer = await blob.arrayBuffer();
       files.push({
