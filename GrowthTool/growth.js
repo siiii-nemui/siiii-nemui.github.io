@@ -148,10 +148,12 @@ function processLog(htmlContent) {
       const cbrMatch = body.match(
         /(CBRB?\(\s*(\d+)\s*,\s*(\d+)\s*\)[^＞]*＞\s*(\d+)\s*\[\s*([^,\]]+?)\s*,\s*([^,\]]+?)\s*\]\s*＞\s*([^\s]+))/i,
       );
-      // 通常ロール：CCBの後のカッコ等を柔軟に拾うように修正
+      // 通常ロール：CCB/RESB(抵抗ロール)の後のカッコ等を柔軟に拾うように修正
       const singleMatch =
         !cbrMatch &&
-        body.match(/(CCB?.*?<=?(\d+).*?＞\s*(\d+)\s*＞\s*([^\s]+))/);
+        body.match(
+          /((?:CCB?|RESB?).*?<=?(\d+).*?＞\s*(\d+)\s*＞\s*([^\s]+))/i,
+        );
 
       if (cbrMatch) {
         // 自分の値（1つ目の引数）側の結果を成長チェック判定に使用する
@@ -283,7 +285,7 @@ function applyFilters() {
           // リストにない場合（能力値ロールや独自技能など）、コマンド部分を除去して抽出
           const cleanName = skillDetail
             .replace(/\(1[Dd]100.*/, '')
-            .replace(/^(CBRB?|CCB?)[^ ]*/i, '')
+            .replace(/^(CBRB?|CCB?|RESB?)[^ ]*/i, '')
             .trim();
           skillName = cleanName || skillDetail;
         }
