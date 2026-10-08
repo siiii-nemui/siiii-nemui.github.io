@@ -112,36 +112,30 @@ function processLog(htmlContent) {
     }
     const [_, tab, name, body] = headerMatch;
 
-    // カッコ付きCCBも許容する正規表現に強化
-    if (body.trim().startsWith("x")) {
-      const multiHeader = body.match(/^(x\d+\s+CCB?.*?<=?\d+\s*【.*?】)/);
-      if (multiHeader) {
-        const title = multiHeader[1];
-        const resRegex =
-          /#\d+\s*\(1D100<=?(\d+)\).*?＞\s*(\d+)\s*＞\s*([^\s#]+)/g;
-        let matchRes;
-        let subResults = [];
-        while ((matchRes = resRegex.exec(body)) !== null) {
-          const [__, targetVal, value, status] = matchRes;
-          subResults.push({
-            detail: `(1D100<=${targetVal}) ＞ ${value} ＞ ${status}`,
-            value: parseInt(value),
-            target: parseInt(targetVal),
-            status: status,
-          });
-        }
-        if (subResults.length > 0) {
-          rawLogData.push({
-            isDice: true,
-            tab,
-            name,
-            title,
-            subResults,
-            isMulti: true,
-            fullText: text,
-            lineIndex: index,
-          });
-        }
+    // 複数回ロール（x3 / X3 / rep3 / repeat3 CCB<=50 【目星】 など）
+    // 出力は「コマンド #1 (1D100<=50) ＞ 23 ＞ 成功 #2 ...」の形式
+    if (/^(?:x|rep|repeat)\d+\s/i.test(body.trim())) {
+      const segments = body.trim().split(/#\d+/);
+      const title = segments.shift().trim();
+      const subResults = segments.map(parseRepeatSegment).filter(Boolean);
+      if (subResults.length > 0) {
+        rawLogData.push({
+          isDice: true,
+          tab,
+          name,
+          title,
+          subResults,
+          isMulti: true,
+          fullText: text,
+          lineIndex: index,
+        });
+      } else {
+        // 1D100判定以外（x2 2d6 など）はダイスとして扱わない
+        rawLogData.push({
+          isDice: false,
+          fullText: text,
+          lineIndex: index,
+        });
       }
     } else {
       // 組み合わせロール（CBR/CBRB(自分の値,相手の値)）：出目1つを2つの目標値と比較する形式
@@ -194,6 +188,37 @@ function processLog(htmlContent) {
     }
   });
   applyFilters();
+}
+
+// 複数回ロールの1回分（#n 以降のテキスト）を解析する
+function parseRepeatSegment(segment) {
+  // 組み合わせロール：(1D100<=50,60) ＞ 23[成功,成功] ＞ 成功
+  const cbr = segment.match(
+    /\(1D100<=(\d+)\s*,\s*(\d+)\)\s*＞\s*(\d+)\s*\[\s*([^,\]]+?)\s*,\s*([^,\]]+?)\s*\]\s*＞\s*([^\s#]+)/i,
+  );
+  if (cbr) {
+    const [detail, selfTarget, , value, selfStatus] = cbr;
+    return {
+      detail,
+      value: parseInt(value),
+      target: parseInt(selfTarget),
+      status: selfStatus,
+    };
+  }
+  // 通常ロール・抵抗ロール：(1D100<=50) ＞ 23 ＞ 成功
+  const single = segment.match(
+    /\(1D100<=(\d+)\)\s*＞\s*(\d+)\s*＞\s*([^\s#]+)/i,
+  );
+  if (single) {
+    const [detail, target, value, status] = single;
+    return {
+      detail,
+      value: parseInt(value),
+      target: parseInt(target),
+      status,
+    };
+  }
+  return null;
 }
 
 function applyFilters() {
@@ -285,6 +310,7 @@ function applyFilters() {
           // リストにない場合（能力値ロールや独自技能など）、コマンド部分を除去して抽出
           const cleanName = skillDetail
             .replace(/\(1[Dd]100.*/, '')
+            .replace(/^(?:x|rep|repeat)\d+\s+/i, '')
             .replace(/^(CBRB?|CCB?|RESB?)[^ ]*/i, '')
             .trim();
           skillName = cleanName || skillDetail;
@@ -452,7 +478,11 @@ function render(data) {
                         ? "初期値成功"
                         : null;
               if (label)
-                categories[label].push({ detail: sub.detail, type: sub.type });
+                categories[label].push({
+                  parentTitle: log.title,
+                  detail: sub.detail,
+                  type: sub.type,
+                });
             });
           } else if (!log.isHidden) {
             const label =
@@ -473,8 +503,18 @@ function render(data) {
       for (let cat in categories) {
         if (categories[cat].length > 0) {
           userHtml += `<div class="category-label">${cat}</div>`;
+          let lastParent = "";
           categories[cat].forEach((item) => {
-            userHtml += `<div class="log-line ${item.type}">${item.detail}</div>`;
+            if (item.parentTitle) {
+              if (lastParent !== item.parentTitle) {
+                userHtml += `<div class="log-line">${item.parentTitle}</div>`;
+                lastParent = item.parentTitle;
+              }
+              userHtml += `<div class="log-line ${item.type}" style="padding-left: 2em;">${item.detail}</div>`;
+            } else {
+              userHtml += `<div class="log-line ${item.type}">${item.detail}</div>`;
+              lastParent = "";
+            }
           });
         }
       }
